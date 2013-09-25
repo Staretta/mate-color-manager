@@ -772,8 +772,10 @@ mcm_calibrate_device_get_reference_data (const gchar *directory, GtkWindow *wind
 	GtkWidget *dialog;
 	GtkFileFilter *filter;
 
-	/* TRANSLATORS: dialog for file->open dialog */
-	dialog = gtk_file_chooser_dialog_new (_("Select CIE reference values file"), window,
+	/* TRANSLATORS: dialog for file->open dialog. A calibration target image is the
+	 * aquired image of the calibration target, e.g. an image file that looks
+	 * a bit like this: http://www.colorreference.de/targets/target.jpg */
+	dialog = gtk_file_chooser_dialog_new (_("Select calibration target image"), window,
 					       GTK_FILE_CHOOSER_ACTION_OPEN,
 					       GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 					       GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
@@ -1119,7 +1121,7 @@ mcm_calibrate_device (McmCalibrate *calibrate, GtkWindow *window, GError **error
 		g_set_error_literal (error,
 				     MCM_CALIBRATE_ERROR,
 				     MCM_CALIBRATE_ERROR_USER_ABORT,
-				     "could not get reference image");
+				     "could not get calibration target image");
 		ret = FALSE;
 		goto out;
 	}
