@@ -316,7 +316,7 @@ mcm_session_LDADD =					\
 mcm_session_CFLAGS =				\
 	$(WARNINGFLAGS_C)
 
-if EGG_BUILD_TESTS
+if MCM_BUILD_TESTS
 
 check_PROGRAMS =					\
 	mcm-self-test
