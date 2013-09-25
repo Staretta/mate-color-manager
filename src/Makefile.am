@@ -3,7 +3,6 @@ INCLUDES =							\
 	$(X11_CFLAGS)					\
 	$(GTK_CFLAGS)					\
 	$(MATEDESKTOP_CFLAGS)			\
-	$(UNIQUE_CFLAGS)				\
 	$(VTE_CFLAGS)					\
 	$(LCMS_CFLAGS)					\
 	$(XORG_CFLAGS)					\
@@ -252,7 +251,6 @@ mcm_prefs_LDADD =					\
 	$(GLIB_LIBS)					\
 	$(X11_LIBS)						\
 	$(MATEDESKTOP_LIBS)				\
-	$(UNIQUE_LIBS)					\
 	$(VTE_LIBS)						\
 	$(GUDEV_LIBS)					\
 	$(LCMS_LIBS)					\
@@ -276,8 +274,6 @@ mcm_picker_LDADD = \
 	$(GLIB_LIBS) \
 	$(X11_LIBS) \
 	$(MATEDESKTOP_LIBS) \
-	$(UNIQUE_LIBS) \
-	$(MATECONF_LIBS) \
 	$(VTE_LIBS) \
 	$(GUDEV_LIBS) \
 	$(LCMS_LIBS) \
@@ -301,7 +297,6 @@ mcm_session_LDADD =					\
 	$(GLIB_LIBS)					\
 	$(X11_LIBS)						\
 	$(MATEDESKTOP_LIBS)				\
-	$(UNIQUE_LIBS)					\
 	$(GUDEV_LIBS)					\
 	$(LCMS_LIBS)					\
 	$(XORG_LIBS)					\

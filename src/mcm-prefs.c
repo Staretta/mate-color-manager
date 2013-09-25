@@ -24,7 +24,6 @@
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
 #include <math.h>
-#include <unique/unique.h>
 #include <glib/gstdio.h>
 #include <gudev/gudev.h>
 #include <libmateui/mate-rr.h>
@@ -129,8 +128,8 @@ mcm_prefs_error_dialog (const gchar *title, const gchar *message)
 static void
 mcm_prefs_close_cb (GtkWidget *widget, gpointer data)
 {
-	GMainLoop *loop = (GMainLoop *) data;
-	g_main_loop_quit (loop);
+	GApplication *application = (GApplication *) data;
+	g_application_quit (application, 0);
 }
 
 /**
@@ -941,7 +940,7 @@ mcm_prefs_calibrate_cb (GtkWidget *widget, gpointer data)
 	}
 
 	/* find an existing profile of this name */
-	profile_array = gcm_device_get_profiles (current_device);
+	profile_array = mcm_device_get_profiles (current_device);
 	destination = g_file_get_path (dest);
 	for (i=0; i<profile_array->len; i++) {
 		profile = g_ptr_array_index (profile_array, i);
@@ -1442,20 +1441,6 @@ mcm_prefs_reset_cb (GtkWidget *widget, gpointer data)
 	/* we only want one save, not three */
 	widget = GTK_WIDGET (gtk_builder_get_object (builder, "hscale_contrast"));
 	gtk_range_set_value (GTK_RANGE (widget), 1.0f);
-}
-
-/**
- * mcm_prefs_message_received_cb
- **/
-static UniqueResponse
-mcm_prefs_message_received_cb (UniqueApp *app, UniqueCommand command, UniqueMessageData *message_data, guint time_ms, gpointer data)
-{
-	GtkWindow *window;
-	if (command == UNIQUE_ACTIVATE) {
-		window = GTK_WINDOW (gtk_builder_get_object (builder, "dialog_prefs"));
-		gtk_window_present (window);
-	}
-	return UNIQUE_RESPONSE_OK;
 }
 
 /**
@@ -3111,6 +3096,20 @@ mcm_prefs_button_virtual_entry_changed_cb (GtkEntry *entry, GParamSpec *pspec, g
 }
 
 /**
+ * mcm_prefs_application_prepare_action_cb:
+ **/
+static void
+mcm_prefs_application_prepare_action_cb (GApplication *application, GVariant *arguments,
+					 GVariant *platform_data, gpointer user_data)
+{
+	GtkWindow *window;
+
+	egg_debug ("application prepare action");
+	window = GTK_WINDOW (gtk_builder_get_object (builder, "dialog_prefs"));
+	gtk_window_present (window);
+}
+
+/**
  * main:
  **/
 int
@@ -3120,15 +3119,14 @@ main (int argc, char **argv)
 	GOptionContext *context;
 	GtkWidget *main_window;
 	GtkWidget *widget;
-	UniqueApp *unique_app;
 	guint xid = 0;
 	GError *error = NULL;
-	GMainLoop *loop;
 	GtkTreeSelection *selection;
 	GtkWidget *info_bar_loading_label;
 	GtkWidget *info_bar_vcgt_label;
 	GtkWidget *info_bar_profiles_label;
 	GdkScreen *screen;
+	GApplication *application;
 
 	const GOptionEntry options[] = {
 		{ "parent-window", 'p', 0, G_OPTION_ARG_INT, &xid,
@@ -3152,18 +3150,10 @@ main (int argc, char **argv)
 	g_option_context_parse (context, &argc, &argv, NULL);
 	g_option_context_free (context);
 
-	/* block in a loop */
-	loop = g_main_loop_new (NULL, FALSE);
-
-	/* are we already activated? */
-	unique_app = unique_app_new ("org.mate.ColorManager.Prefs", NULL);
-	if (unique_app_is_running (unique_app)) {
-		egg_debug ("You have another instance running. This program will now close");
-		unique_app_send_message (unique_app, UNIQUE_ACTIVATE, NULL);
-		goto out;
-	}
-	g_signal_connect (unique_app, "message-received",
-			  G_CALLBACK (mcm_prefs_message_received_cb), NULL);
+	/* ensure single instance */
+	application = g_application_new_and_register ("org.gnome.ColorManager.Prefs", argc, argv);
+	g_signal_connect (application, "prepare-activation",
+			  G_CALLBACK (mcm_prefs_application_prepare_action_cb), NULL);
 
 	/* get UI */
 	builder = gtk_builder_new ();
@@ -3244,17 +3234,17 @@ main (int argc, char **argv)
 	gtk_widget_hide (main_window);
 	gtk_window_set_icon_name (GTK_WINDOW (main_window), MCM_STOCK_ICON);
 	g_signal_connect (main_window, "delete_event",
-			  G_CALLBACK (mcm_prefs_delete_event_cb), loop);
+			  G_CALLBACK (mcm_prefs_delete_event_cb), application);
 	g_signal_connect (main_window, "drag-data-received",
-			  G_CALLBACK (mcm_prefs_drag_data_received_cb), loop);
+			  G_CALLBACK (mcm_prefs_drag_data_received_cb), application);
 	mcm_prefs_setup_drag_and_drop (GTK_WIDGET(main_window));
 
 	widget = GTK_WIDGET (gtk_builder_get_object (builder, "button_close"));
 	g_signal_connect (widget, "clicked",
-			  G_CALLBACK (mcm_prefs_close_cb), loop);
+			  G_CALLBACK (mcm_prefs_close_cb), application);
 	widget = GTK_WIDGET (gtk_builder_get_object (builder, "button_default"));
 	g_signal_connect (widget, "clicked",
-			  G_CALLBACK (mcm_prefs_default_cb), loop);
+			  G_CALLBACK (mcm_prefs_default_cb), application);
 	widget = GTK_WIDGET (gtk_builder_get_object (builder, "button_help"));
 	g_signal_connect (widget, "clicked",
 			  G_CALLBACK (mcm_prefs_help_cb), NULL);
@@ -3500,11 +3490,9 @@ main (int argc, char **argv)
 	g_idle_add (mcm_prefs_startup_phase1_idle_cb, NULL);
 
 	/* wait */
-	g_main_loop_run (loop);
-
+	g_application_run (application);
 out:
-	g_object_unref (unique_app);
-	g_main_loop_unref (loop);
+	g_object_unref (application);
 	if (current_device != NULL)
 		g_object_unref (current_device);
 	if (colorimeter != NULL)
