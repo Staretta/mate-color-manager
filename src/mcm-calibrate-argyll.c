@@ -50,6 +50,8 @@
 
 #define FIXED_ARGYLL
 
+//#define USE_DOUBLE_DENSITY
+
 static void     mcm_calibrate_argyll_finalize	(GObject     *object);
 
 #define MCM_CALIBRATE_ARGYLL_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), MCM_TYPE_CALIBRATE_ARGYLL, McmCalibrateArgyllPrivate))
@@ -172,11 +174,13 @@ mcm_calibrate_argyll_printer_get_patches (McmCalibrateArgyll *calibrate_argyll)
 	else if (precision == MCM_CALIBRATE_PRECISION_LONG)
 		patches = 360;
 
+#ifdef USE_DOUBLE_DENSITY
 	/* using double density, so we can double the patch count */
 	if (colorimeter_kind == MCM_COLORIMETER_KIND_COLOR_MUNKI ||
 	    colorimeter_kind == MCM_COLORIMETER_KIND_SPECTRO_SCAN) {
 		patches *= 2;
 	}
+#endif
 
 	return patches;
 }
@@ -1610,11 +1614,13 @@ mcm_calibrate_argyll_display_generate_targets (McmCalibrateArgyll *calibrate_arg
 	/* target instrument */
 	g_ptr_array_add (array, g_strdup_printf ("-i%s", mcm_calibrate_argyll_get_colorimeter_target (calibrate_argyll)));
 
+#ifdef USE_DOUBLE_DENSITY
 	/* use double density */
 	if (colorimeter_kind == MCM_COLORIMETER_KIND_COLOR_MUNKI ||
 	    colorimeter_kind == MCM_COLORIMETER_KIND_SPECTRO_SCAN) {
 		g_ptr_array_add (array, g_strdup ("-h"));
 	}
+#endif
 
 	/* 8 bit TIFF 300 dpi */
 	g_ptr_array_add (array, g_strdup ("-t300"));
