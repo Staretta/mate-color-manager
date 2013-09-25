@@ -101,7 +101,7 @@ dnl ---------------------------------------------------------------------------
 dnl - Library dependencies
 dnl ---------------------------------------------------------------------------
 GLIB_REQUIRED=2.14.0
-GTK_REQUIRED=2.14.0
+GTK_REQUIRED=2.90.0
 MATEDESKTOP_REQUIRED=1.2.0
 VTE_REQUIRED=0.25.1
 CANBERRA_REQUIRED=0.10
@@ -112,7 +112,7 @@ dnl - Check library dependencies
 dnl ---------------------------------------------------------------------------
 PKG_CHECK_MODULES(GLIB, glib-2.0 >= $GLIB_REQUIRED gobject-2.0 gthread-2.0 gio-2.0 >= $GIO_REQUIRED)
 PKG_CHECK_MODULES(XORG, xxf86vm xrandr)
-PKG_CHECK_MODULES(GTK, gtk+-2.0 >= $GTK_REQUIRED)
+PKG_CHECK_MODULES(GTK, gtk+-3.0 >= $GTK_REQUIRED)
 PKG_CHECK_MODULES(MATEDESKTOP, mate-desktop-2.0 >= $MATEDESKTOP_REQUIRED)
 PKG_CHECK_MODULES(VTE, vte >= $VTE_REQUIRED)
 PKG_CHECK_MODULES(GUDEV, gudev-1.0)
