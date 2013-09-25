@@ -80,6 +80,7 @@ struct _McmClientPrivate
 	gboolean			 init_cups;
 	gboolean			 init_sane;
 	guint				 refresh_id;
+	guint				 emit_added_id;
 };
 
 enum {
@@ -1161,6 +1162,44 @@ out:
 	return ret;
 }
 
+typedef struct {
+	McmClient *client;
+	McmDevice *device;
+} McmClientEmitHelper;
+
+/**
+ * mcm_client_emit_added_idle_cb:
+ **/
+static gboolean
+mcm_client_emit_added_idle_cb (McmClientEmitHelper *helper)
+{
+	/* emit a signal */
+	egg_debug ("emit added: %s", mcm_device_get_id (helper->device));
+	g_signal_emit (helper->client, signals[SIGNAL_ADDED], 0, helper->device);
+	helper->client->priv->emit_added_id = 0;
+
+	g_object_unref (helper->client);
+	g_object_unref (helper->device);
+	g_free (helper);
+	return FALSE;
+}
+
+/**
+ * mcm_client_emit_added_idle:
+ **/
+static void
+mcm_client_emit_added_idle (McmClient *client, McmDevice *device)
+{
+	McmClientEmitHelper *helper;
+	helper = g_new0 (McmClientEmitHelper, 1);
+	helper->client = g_object_ref (client);
+	helper->device = g_object_ref (device);
+	client->priv->emit_added_id = g_idle_add ((GSourceFunc) mcm_client_emit_added_idle_cb, helper);
+#if GLIB_CHECK_VERSION(2,25,8)
+	g_source_set_name_by_id (client->priv->emit_added_id, "[McmClient] emit added for device");
+#endif
+}
+
 /**
  * mcm_client_add_device:
  **/
@@ -1197,13 +1236,10 @@ mcm_client_add_device (McmClient *client, McmDevice *device, GError **error)
 
 	/* add to the array */
 	g_ptr_array_add (client->priv->array, g_object_ref (device));
-
-	/* emit a signal */
-	egg_debug ("emit added: %s", device_id);
-	g_signal_emit (client, signals[SIGNAL_ADDED], 0, device);
-
-	/* connect to the changed signal */
 	g_signal_connect (device, "changed", G_CALLBACK (mcm_client_device_changed_cb), client);
+
+	/* emit a signal from the main thread, not this one */
+	mcm_client_emit_added_idle (client, device);
 
 	/* all okay */
 	ret = TRUE;
@@ -1458,6 +1494,8 @@ mcm_client_finalize (GObject *object)
 	/* disconnect anything that's about to fire */
 	if (priv->refresh_id != 0)
 		g_source_remove (priv->refresh_id);
+	if (priv->emit_added_id != 0)
+		g_source_remove (priv->emit_added_id);
 
 	/* do not respond to changed events */
 	for (i=0; i<priv->array->len; i++) {
