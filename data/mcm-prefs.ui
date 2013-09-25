@@ -246,29 +246,7 @@
                           <object class="GtkVBox" id="vbox_device">
                             <property name="visible">True</property>
                             <property name="orientation">vertical</property>
-                            <property name="spacing">6</property>
-                            <child>
-                              <object class="GtkHBox" id="hbox19">
-                                <property name="visible">True</property>
-                                <child>
-                                  <object class="GtkLabel" id="label_device">
-                                    <property name="visible">True</property>
-                                    <property name="label" translatable="yes" comments="Section heading for device settings">Device</property>
-                                    <attributes>
-                                      <attribute name="weight" value="bold"/>
-                                    </attributes>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="position">0</property>
-                                  </packing>
-                                </child>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
+                            <property name="spacing">12</property>
                             <child>
                               <object class="GtkAlignment" id="alignment2">
                                 <property name="visible">True</property>
@@ -293,9 +271,13 @@
                                                   <object class="GtkLabel" id="label_title_manufacturer">
                                                     <property name="visible">True</property>
                                                     <property name="label" translatable="yes" comments="The manufacturer of the device">Manufacturer:</property>
+                                                    <attributes>
+                                                      <attribute name="weight" value="bold"/>
+                                                    </attributes>
                                                   </object>
                                                   <packing>
                                                     <property name="expand">False</property>
+                                                    <property name="pack_type">end</property>
                                                     <property name="position">0</property>
                                                   </packing>
                                                 </child>
@@ -321,6 +303,7 @@
                                                 </child>
                                               </object>
                                               <packing>
+                                                <property name="expand">False</property>
                                                 <property name="position">1</property>
                                               </packing>
                                             </child>
@@ -341,9 +324,13 @@
                                                   <object class="GtkLabel" id="label_title_model">
                                                     <property name="visible">True</property>
                                                     <property name="label" translatable="yes" comments="The model of the device">Model:</property>
+                                                    <attributes>
+                                                      <attribute name="weight" value="bold"/>
+                                                    </attributes>
                                                   </object>
                                                   <packing>
                                                     <property name="expand">False</property>
+                                                    <property name="pack_type">end</property>
                                                     <property name="position">0</property>
                                                   </packing>
                                                 </child>
@@ -369,6 +356,7 @@
                                                 </child>
                                               </object>
                                               <packing>
+                                                <property name="expand">False</property>
                                                 <property name="position">1</property>
                                               </packing>
                                             </child>
@@ -388,10 +376,14 @@
                                                 <child>
                                                   <object class="GtkLabel" id="label_title_serial">
                                                     <property name="visible">True</property>
+                                                    <attributes>
+                                                      <attribute name="weight" value="bold"/>
+                                                    </attributes>
                                                     <property name="label" translatable="yes" comments="The serial number of the device">Serial number:</property>
                                                   </object>
                                                   <packing>
                                                     <property name="expand">False</property>
+                                                    <property name="pack_type">end</property>
                                                     <property name="position">0</property>
                                                   </packing>
                                                 </child>
@@ -417,6 +409,7 @@
                                                 </child>
                                               </object>
                                               <packing>
+                                                <property name="expand">False</property>
                                                 <property name="position">1</property>
                                               </packing>
                                             </child>
@@ -437,9 +430,13 @@
                                                   <object class="GtkLabel" id="label_title_eisa">
                                                     <property name="visible">True</property>
                                                     <property name="label" translatable="yes" comments="The EISA (standards body) identifier of the device">EISA ID:</property>
+                                                    <attributes>
+                                                      <attribute name="weight" value="bold"/>
+                                                    </attributes>
                                                   </object>
                                                   <packing>
                                                     <property name="expand">False</property>
+                                                    <property name="pack_type">end</property>
                                                     <property name="position">0</property>
                                                   </packing>
                                                 </child>
@@ -465,6 +462,7 @@
                                                 </child>
                                               </object>
                                               <packing>
+                                                <property name="expand">False</property>
                                                 <property name="position">1</property>
                                               </packing>
                                             </child>
@@ -472,25 +470,6 @@
                                           <packing>
                                             <property name="padding">3</property>
                                             <property name="position">3</property>
-                                          </packing>
-                                        </child>
-                                        <child>
-                                          <object class="GtkHBox" id="hbox3">
-                                            <property name="visible">True</property>
-                                            <child>
-                                              <object class="GtkLabel" id="label_problems">
-                                                <property name="visible">True</property>
-                                                <property name="label">Problems</property>
-                                                <property name="selectable">True</property>
-                                              </object>
-                                              <packing>
-                                                <property name="expand">False</property>
-                                                <property name="position">0</property>
-                                              </packing>
-                                            </child>
-                                          </object>
-                                          <packing>
-                                            <property name="position">4</property>
                                           </packing>
                                         </child>
                                       </object>
@@ -503,6 +482,24 @@
                               </object>
                               <packing>
                                 <property name="expand">False</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkHBox" id="hbox3">
+                                <property name="visible">True</property>
+                                <child>
+                                  <object class="GtkLabel" id="label_problems">
+                                    <property name="label">Problems</property>
+                                    <property name="selectable">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
                                 <property name="position">1</property>
                               </packing>
                             </child>
@@ -772,34 +769,12 @@
                           <object class="GtkVBox" id="vbox13">
                             <property name="visible">True</property>
                             <property name="orientation">vertical</property>
-                            <property name="spacing">6</property>
+                            <property name="spacing">12</property>
                             <child>
                               <object class="GtkVBox" id="vbox_profile_info">
                                 <property name="visible">True</property>
                                 <property name="orientation">vertical</property>
                                 <property name="spacing">6</property>
-                                <child>
-                                  <object class="GtkHBox" id="hbox38">
-                                    <property name="visible">True</property>
-                                    <child>
-                                      <object class="GtkLabel" id="label_profile1">
-                                        <property name="visible">True</property>
-                                        <property name="label" translatable="yes" comments="Section heading for device profile settings">Color Profile</property>
-                                        <attributes>
-                                          <attribute name="weight" value="bold"/>
-                                        </attributes>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="position">0</property>
-                                      </packing>
-                                    </child>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="position">0</property>
-                                  </packing>
-                                </child>
                                 <child>
                                   <object class="GtkAlignment" id="alignment5">
                                     <property name="visible">True</property>
@@ -824,9 +799,13 @@
                                                       <object class="GtkLabel" id="label_title_type">
                                                         <property name="visible">True</property>
                                                         <property name="label" translatable="yes" comments="The type of profile, e.g. display, scanner, etc.">Profile type:</property>
+                                                        <attributes>
+                                                          <attribute name="weight" value="bold"/>
+                                                        </attributes>
                                                       </object>
                                                       <packing>
                                                         <property name="expand">False</property>
+                                                        <property name="pack_type">end</property>
                                                         <property name="position">0</property>
                                                       </packing>
                                                     </child>
@@ -876,9 +855,13 @@
                                                       <object class="GtkLabel" id="label_title_colorspace">
                                                         <property name="visible">True</property>
                                                         <property name="label" translatable="yes" comments="The profile colorspace, e.g. RGB">Colorspace:</property>
+                                                        <attributes>
+                                                          <attribute name="weight" value="bold"/>
+                                                        </attributes>
                                                       </object>
                                                       <packing>
                                                         <property name="expand">False</property>
+                                                        <property name="pack_type">end</property>
                                                         <property name="position">0</property>
                                                       </packing>
                                                     </child>
@@ -928,9 +911,13 @@
                                                       <object class="GtkLabel" id="label_title_datetime">
                                                         <property name="visible">True</property>
                                                         <property name="label" translatable="yes" comments="When the profile was created">Created:</property>
+                                                        <attributes>
+                                                          <attribute name="weight" value="bold"/>
+                                                        </attributes>
                                                       </object>
                                                       <packing>
                                                         <property name="expand">False</property>
+                                                        <property name="pack_type">end</property>
                                                         <property name="position">0</property>
                                                       </packing>
                                                     </child>
@@ -980,9 +967,13 @@
                                                       <object class="GtkLabel" id="label_title_profile_manufacturer">
                                                         <property name="visible">True</property>
                                                         <property name="label" translatable="yes" comments="The manufacturer of the profile">Device manufacturer:</property>
+                                                        <attributes>
+                                                          <attribute name="weight" value="bold"/>
+                                                        </attributes>
                                                       </object>
                                                       <packing>
                                                         <property name="expand">False</property>
+                                                        <property name="pack_type">end</property>
                                                         <property name="position">0</property>
                                                       </packing>
                                                     </child>
@@ -1032,9 +1023,13 @@
                                                       <object class="GtkLabel" id="label_title_profile_model">
                                                         <property name="visible">True</property>
                                                         <property name="label" translatable="yes" comments="The manufacturer of the profile">Device model:</property>
+                                                        <attributes>
+                                                          <attribute name="weight" value="bold"/>
+                                                        </attributes>
                                                       </object>
                                                       <packing>
                                                         <property name="expand">False</property>
+                                                        <property name="pack_type">end</property>
                                                         <property name="position">0</property>
                                                       </packing>
                                                     </child>
@@ -1084,9 +1079,13 @@
                                                       <object class="GtkLabel" id="label_title_vcgt">
                                                         <property name="visible">True</property>
                                                         <property name="label" translatable="yes" comments="If the profile contains a display correction table">Display correction:</property>
+                                                        <attributes>
+                                                          <attribute name="weight" value="bold"/>
+                                                        </attributes>
                                                       </object>
                                                       <packing>
                                                         <property name="expand">False</property>
+                                                        <property name="pack_type">end</property>
                                                         <property name="position">0</property>
                                                       </packing>
                                                     </child>
@@ -1136,9 +1135,13 @@
                                                       <object class="GtkLabel" id="label_title_copyright">
                                                         <property name="visible">True</property>
                                                         <property name="label" translatable="yes" comments="The licence of the profile, normally non-free">License:</property>
+                                                        <attributes>
+                                                          <attribute name="weight" value="bold"/>
+                                                        </attributes>
                                                       </object>
                                                       <packing>
                                                         <property name="expand">False</property>
+                                                        <property name="pack_type">end</property>
                                                         <property name="position">0</property>
                                                       </packing>
                                                     </child>
@@ -1188,9 +1191,13 @@
                                                       <object class="GtkLabel" id="label_title_size">
                                                         <property name="visible">True</property>
                                                         <property name="label" translatable="yes" comments="The file size in bytes of the profile">File size:</property>
+                                                        <attributes>
+                                                          <attribute name="weight" value="bold"/>
+                                                        </attributes>
                                                       </object>
                                                       <packing>
                                                         <property name="expand">False</property>
+                                                        <property name="pack_type">end</property>
                                                         <property name="position">0</property>
                                                       </packing>
                                                     </child>
@@ -1240,9 +1247,13 @@
                                                       <object class="GtkLabel" id="label_title_filename">
                                                         <property name="visible">True</property>
                                                         <property name="label" translatable="yes" comments="The basename (the last section of the filename) of the profile">Filename:</property>
+                                                        <attributes>
+                                                          <attribute name="weight" value="bold"/>
+                                                        </attributes>
                                                       </object>
                                                       <packing>
                                                         <property name="expand">False</property>
+                                                        <property name="pack_type">end</property>
                                                         <property name="position">0</property>
                                                       </packing>
                                                     </child>
@@ -1293,7 +1304,7 @@
                                   </object>
                                   <packing>
                                     <property name="expand">False</property>
-                                    <property name="position">1</property>
+                                    <property name="position">0</property>
                                   </packing>
                                 </child>
                               </object>
