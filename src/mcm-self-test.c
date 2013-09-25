@@ -477,6 +477,7 @@ mcm_test_device_func (void)
 	g_free (icc_filename1);
 	g_free (icc_filename2);
 	g_free (contents);
+	g_ptr_array_unref (profiles);
 
 	g_object_unref (device);
 }

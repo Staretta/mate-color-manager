@@ -978,6 +978,8 @@ mcm_prefs_calibrate_cb (GtkWidget *widget, gpointer data)
 			 CA_PROP_EVENT_DESCRIPTION, _("Profiling completed"), NULL);
 out:
 	g_free (destination);
+	if (profile_array != NULL)
+		g_ptr_array_unref (profile_array);
 	if (calibrate != NULL)
 		g_object_unref (calibrate);
 	if (file != NULL)
@@ -1665,7 +1667,7 @@ mcm_prefs_devices_treeview_clicked_cb (GtkTreeSelection *selection, gpointer use
 	const gchar *device_model = NULL;
 	const gchar *device_manufacturer = NULL;
 	const gchar *eisa_id = NULL;
-	GPtrArray *profiles;
+	GPtrArray *profiles = NULL;
 	McmProfile *profile;
 
 	/* This will only work in single or browse selection mode! */
@@ -1815,6 +1817,8 @@ mcm_prefs_devices_treeview_clicked_cb (GtkTreeSelection *selection, gpointer use
 	/* can this device calibrate */
 	mcm_prefs_set_calibrate_button_sensitivity ();
 out:
+	if (profiles != NULL)
+		g_ptr_array_unref (profiles);
 	g_free (id);
 }
 

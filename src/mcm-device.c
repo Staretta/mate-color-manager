@@ -486,13 +486,13 @@ mcm_device_set_title (McmDevice *device, const gchar *title)
 /**
  * mcm_device_get_profiles:
  *
- * Return value: the profiles. Do not unref this value
+ * Return value: the profiles. Free with g_ptr_array_unref()
  **/
 GPtrArray *
 mcm_device_get_profiles (McmDevice *device)
 {
 	g_return_val_if_fail (MCM_IS_DEVICE (device), NULL);
-	return device->priv->profiles;
+	return g_ptr_array_ref (device->priv->profiles);
 }
 
 /**
