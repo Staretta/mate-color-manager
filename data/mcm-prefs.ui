@@ -1532,18 +1532,6 @@
                                 <property name="visible">True</property>
                                 <property name="spacing">9</property>
                                 <child>
-                                  <object class="GtkImage" id="image3">
-                                    <property name="visible">True</property>
-                                    <property name="stock">gtk-dialog-info</property>
-                                    <property name="icon-size">6</property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">False</property>
-                                    <property name="position">0</property>
-                                  </packing>
-                                </child>
-                                <child>
                                   <object class="GtkLabel" id="label14">
                                     <property name="visible">True</property>
                                     <property name="label" translatable="yes">A working space is a default colorspace that is not associated with a specific device.</property>
@@ -1552,7 +1540,7 @@
                                   <packing>
                                     <property name="expand">False</property>
                                     <property name="fill">False</property>
-                                    <property name="position">1</property>
+                                    <property name="position">0</property>
                                   </packing>
                                 </child>
                               </object>
@@ -1686,18 +1674,6 @@
                                 <property name="visible">True</property>
                                 <property name="spacing">9</property>
                                 <child>
-                                  <object class="GtkImage" id="image4">
-                                    <property name="visible">True</property>
-                                    <property name="stock">gtk-dialog-info</property>
-                                    <property name="icon-size">6</property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">False</property>
-                                    <property name="position">0</property>
-                                  </packing>
-                                </child>
-                                <child>
                                   <object class="GtkLabel" id="label15">
                                     <property name="visible">True</property>
                                     <property name="label" translatable="yes">The rendering intent defines how color should be transformed from one colorspace to another.</property>
@@ -1706,7 +1682,7 @@
                                   <packing>
                                     <property name="expand">False</property>
                                     <property name="fill">False</property>
-                                    <property name="position">1</property>
+                                    <property name="position">0</property>
                                   </packing>
                                 </child>
                               </object>
