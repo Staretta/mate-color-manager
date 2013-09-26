@@ -115,7 +115,7 @@ bin_PROGRAMS =					\
 	mcm-picker					\
 	mcm-import
 
-if MCM_USE_EXIV
+if HAVE_EXIV
 libexec_PROGRAMS = mcm-helper-exiv
 mcm_helper_exiv_SOURCES = mcm-helper-exiv.cpp
 mcm_helper_exiv_LDADD = $(EXIV_LIBS)
@@ -311,7 +311,7 @@ mcm_session_LDADD =					\
 mcm_session_CFLAGS =				\
 	$(WARNINGFLAGS_C)
 
-if MCM_BUILD_TESTS
+if HAVEmake
 
 check_PROGRAMS =					\
 	mcm-self-test

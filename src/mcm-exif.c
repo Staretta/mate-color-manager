@@ -200,7 +200,7 @@ out:
 	return ret;
 }
 
-#ifdef MCM_USE_EXIV
+#ifdef HAVE_EXIV
 /**
  * mcm_exif_parse_exiv:
  **/
@@ -297,7 +297,7 @@ mcm_exif_parse (McmExif *exif, GFile *file, GError **error)
 		goto out;
 	}
 
-#ifdef MCM_USE_EXIV
+#ifdef HAVE_EXIV
 	if (g_strcmp0 (content_type, "image/x-adobe-dng") == 0 ||
 	    g_strcmp0 (content_type, "image/x-canon-crw") == 0 ||
 	    g_strcmp0 (content_type, "image/x-fuji-raf") == 0 ||

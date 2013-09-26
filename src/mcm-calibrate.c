@@ -1008,7 +1008,7 @@ mcm_calibrate_device (McmCalibrate *calibrate, GtkWindow *window, GError **error
 	GtkResponseType response;
 	GtkWindow *window_tmp;
 	gchar *precision = NULL;
-#ifdef MCM_USE_PACKAGEKIT
+#ifdef HAVE_PACKAGEKIT
 	GtkWidget *dialog;
 #endif
 	const gchar *title;
@@ -1020,7 +1020,7 @@ mcm_calibrate_device (McmCalibrate *calibrate, GtkWindow *window, GError **error
 	/* install shared-color-targets package */
 	has_shared_targets = g_file_test ("/usr/share/shared-color-targets", G_FILE_TEST_IS_DIR);
 	if (!has_shared_targets) {
-#ifdef MCM_USE_PACKAGEKIT
+#ifdef HAVE_PACKAGEKIT
 		/* ask the user to confirm */
 		dialog = gtk_message_dialog_new (window, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE,
 						 /* TRANSLATORS: title, usually we can tell based on the EDID data or output name */

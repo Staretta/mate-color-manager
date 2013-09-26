@@ -110,9 +110,9 @@ PKG_CHECK_MODULES(X11, x11)
 
 dnl **** Check for VTE ****
 PKG_CHECK_MODULES(VTE, vte3 >= 0.25.1, has_vte=yes, has_vte=no)
-AM_CONDITIONAL(MCM_USE_VTE, test x$has_vte = xyes)
+AM_CONDITIONAL(HAVE_VTE, test x$has_vte = xyes)
 if test x$has_vte = xyes; then
-	AC_DEFINE(MCM_USE_VTE,1,[Use VTE terminal widget])
+	AC_DEFINE(HAVE_VTE,1,[Use VTE terminal widget])
 fi
 
 dnl **** Check for libnotify ****
@@ -146,9 +146,9 @@ dnl **** Check for EXIV ****
 if test x$enable_exiv != xno; then
 	PKG_CHECK_MODULES(EXIV, exiv2)
 fi
-AM_CONDITIONAL(MCM_USE_EXIV, test x$enable_exiv = xyes)
+AM_CONDITIONAL(HAVE_EXIV, test x$enable_exiv = xyes)
 if test x$enable_exiv = xyes; then
-	AC_DEFINE(MCM_USE_EXIV,1,[Use EXIV support for detecting scanners])
+	AC_DEFINE(HAVE_EXIV,1,[Use EXIV support for detecting scanners])
 fi
 
 PKG_CHECK_MODULES(CANBERRA, libcanberra-gtk3 >= 0.10)
@@ -216,9 +216,9 @@ dnl - Use PackageKit to install missing tools
 dnl ---------------------------------------------------------------------------
 AC_ARG_ENABLE(packagekit, AS_HELP_STRING([--enable-packagekit],[enable PackageKit integration]),
 	      enable_packagekit=$enableval,enable_packagekit=yes)
-AM_CONDITIONAL(MCM_USE_PACKAGEKIT, test x$enable_packagekit = xyes)
+AM_CONDITIONAL(HAVE_PACKAGEKIT, test x$enable_packagekit = xyes)
 if test x$enable_packagekit = xyes; then
-	AC_DEFINE(MCM_USE_PACKAGEKIT,1,[Use PackageKit for installing packages])
+	AC_DEFINE(HAVE_PACKAGEKIT,1,[Use PackageKit for installing packages])
 fi
 
 dnl ---------------------------------------------------------------------------
@@ -226,7 +226,7 @@ dnl - Build self tests
 dnl ---------------------------------------------------------------------------
 AC_ARG_ENABLE(tests, AS_HELP_STRING([--enable-tests],[enable unit test code]),
 	      enable_tests=$enableval,enable_tests=yes)
-AM_CONDITIONAL(MCM_BUILD_TESTS, test x$enable_tests = xyes)
+AM_CONDITIONAL(HAVEmake, test x$enable_tests = xyes)
 
 AC_SUBST(MCM_SYSTEM_PROFILES_DIR, "\$(localstatedir)/lib/color")
 

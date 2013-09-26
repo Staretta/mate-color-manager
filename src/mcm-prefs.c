@@ -835,7 +835,7 @@ mcm_prefs_ensure_argyllcms_installed (void)
 	if (ret)
 		goto out;
 
-#ifndef MCM_USE_PACKAGEKIT
+#ifndef HAVE_PACKAGEKIT
 	egg_warning ("cannot install: this package was not compiled with --enable-packagekit");
 	goto out;
 #endif
@@ -1584,7 +1584,7 @@ mcm_prefs_set_calibrate_button_sensitivity (void)
 		goto out;
 	}
 
-#ifndef MCM_USE_VTE
+#ifndef HAVE_VTE
 	has_vte = FALSE;
 #endif
 
