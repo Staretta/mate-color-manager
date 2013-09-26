@@ -1210,9 +1210,13 @@ mcm_client_add_device (McmClient *client, McmDevice *device, GError **error)
 	const gchar *device_id;
 	McmDevice *device_tmp = NULL;
 	GPtrArray *array;
+	static GStaticMutex mutex = G_STATIC_MUTEX_INIT;
 
 	g_return_val_if_fail (MCM_IS_CLIENT (client), FALSE);
 	g_return_val_if_fail (MCM_IS_DEVICE (device), FALSE);
+
+	/* lock */
+	g_static_mutex_lock (&mutex);
 
 	device_id = mcm_device_get_id (device);
 	device_tmp = mcm_client_get_device_by_id (client, device_id);
@@ -1244,6 +1248,9 @@ mcm_client_add_device (McmClient *client, McmDevice *device, GError **error)
 	/* all okay */
 	ret = TRUE;
 out:
+	/* unlock */
+	g_static_mutex_unlock (&mutex);
+
 	if (device_tmp != NULL)
 		g_object_unref (device_tmp);
 	return ret;
