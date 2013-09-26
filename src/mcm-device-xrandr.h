@@ -59,6 +59,7 @@ const gchar	*mcm_device_xrandr_get_native_device	(McmDeviceXrandr	*device_xrandr
 const gchar	*mcm_device_xrandr_get_eisa_id		(McmDeviceXrandr	*device_xrandr);
 const gchar	*mcm_device_xrandr_get_edid_md5		(McmDeviceXrandr	*device_xrandr);
 gboolean	 mcm_device_xrandr_get_fallback		(McmDeviceXrandr	*device_xrandr);
+gboolean	 mcm_device_xrandr_is_primary		(McmDeviceXrandr	*device_xrandr);
 
 G_END_DECLS
 
