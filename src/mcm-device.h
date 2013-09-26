@@ -52,6 +52,7 @@ struct _McmDeviceClass
 	void		 (*changed)			(McmDevice		*device);
 	gboolean	 (*apply)			(McmDevice		*device,
 							 GError			**error);
+	gchar		*(*get_config_data)		(McmDevice		*device);
 	/* padding for future expansion */
 	void (*_mcm_reserved1) (void);
 	void (*_mcm_reserved2) (void);
