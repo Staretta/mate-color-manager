@@ -100,7 +100,7 @@ GLIB_GSETTINGS
 dnl ---------------------------------------------------------------------------
 dnl - Check library dependencies
 dnl ---------------------------------------------------------------------------
-PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.14.0 gobject-2.0 gthread-2.0 gio-2.0 >= 2.25.8)
+PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.14.0 gobject-2.0 gthread-2.0 gio-2.0 >= 2.25.9)
 PKG_CHECK_MODULES(XORG, xxf86vm xrandr)
 PKG_CHECK_MODULES(GTK, gtk+-3.0 >= 2.90.0)
 PKG_CHECK_MODULES(MATEDESKTOP, mate-desktop-2.0 >= 1.2.0)
