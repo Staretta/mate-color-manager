@@ -262,9 +262,13 @@ mcm_client_remove_device_internal (McmClient *client, McmDevice *device, gboolea
 {
 	gboolean ret = FALSE;
 	const gchar *device_id;
+	static GStaticMutex mutex = G_STATIC_MUTEX_INIT;
 
 	g_return_val_if_fail (MCM_IS_CLIENT (client), FALSE);
 	g_return_val_if_fail (MCM_IS_DEVICE (device), FALSE);
+
+	/* lock */
+	g_static_mutex_lock (&mutex);
 
 	/* check device is not connected */
 	device_id = mcm_device_get_id (device);
@@ -289,6 +293,8 @@ mcm_client_remove_device_internal (McmClient *client, McmDevice *device, gboolea
 		g_signal_emit (client, signals[SIGNAL_REMOVED], 0, device);
 	}
 out:
+	/* unlock */
+	g_static_mutex_unlock (&mutex);
 	return ret;
 }
 
