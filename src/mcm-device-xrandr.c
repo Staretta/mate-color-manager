@@ -482,7 +482,7 @@ mcm_device_xrandr_is_primary (McmDeviceXrandr *device_xrandr)
 
 	/* check we have an output */
 	output = mcm_screen_get_output_by_name (device_xrandr->priv->screen,
-						device_xrandr->priv->output_name, NULL);
+						device_xrandr->priv->native_device, NULL);
 	if (output == NULL)
 		goto out;
 
