@@ -54,6 +54,7 @@ struct _McmEdidPrivate
 	gchar				*vendor_name;
 	gchar				*serial_number;
 	gchar				*eisa_id;
+	gchar				*checksum;
 	gchar				*pnp_id;
 	guint				 width;
 	guint				 height;
@@ -67,6 +68,7 @@ enum {
 	PROP_VENDOR_NAME,
 	PROP_SERIAL_NUMBER,
 	PROP_EISA_ID,
+	PROP_CHECKSUM,
 	PROP_GAMMA,
 	PROP_PNP_ID,
 	PROP_WIDTH,
@@ -136,6 +138,16 @@ mcm_edid_get_eisa_id (McmEdid *edid)
 }
 
 /**
+ * mcm_edid_get_checksum:
+ **/
+const gchar *
+mcm_edid_get_checksum (McmEdid *edid)
+{
+	g_return_val_if_fail (MCM_IS_EDID (edid), NULL);
+	return edid->priv->checksum;
+}
+
+/**
  * mcm_edid_get_pnp_id:
  **/
 const gchar *
@@ -190,6 +202,7 @@ mcm_edid_reset (McmEdid *edid)
 	g_free (priv->vendor_name);
 	g_free (priv->serial_number);
 	g_free (priv->eisa_id);
+	g_free (priv->checksum);
 
 	/* do not deallocate, just blank */
 	priv->pnp_id[0] = '\0';
@@ -199,6 +212,7 @@ mcm_edid_reset (McmEdid *edid)
 	priv->vendor_name = NULL;
 	priv->serial_number = NULL;
 	priv->eisa_id = NULL;
+	priv->checksum = NULL;
 	priv->width = 0;
 	priv->height = 0;
 	priv->gamma = 0.0f;
@@ -405,10 +419,14 @@ mcm_edid_parse (McmEdid *edid, const guint8 *data, GError **error)
 	if (extension_blocks > 0)
 		egg_warning ("%i extension blocks to parse", extension_blocks);
 
+	/* calculate checksum */
+	priv->checksum = g_compute_checksum_for_data (G_CHECKSUM_MD5, data, 0x6c);
+
 	/* print what we've got */
 	egg_debug ("monitor name: %s", priv->monitor_name);
 	egg_debug ("serial number: %s", priv->serial_number);
 	egg_debug ("ascii string: %s", priv->eisa_id);
+	egg_debug ("checksum: %s", priv->checksum);
 out:
 	return ret;
 }
@@ -434,6 +452,9 @@ mcm_edid_get_property (GObject *object, guint prop_id, GValue *value, GParamSpec
 		break;
 	case PROP_EISA_ID:
 		g_value_set_string (value, priv->eisa_id);
+		break;
+	case PROP_CHECKSUM:
+		g_value_set_string (value, priv->checksum);
 		break;
 	case PROP_GAMMA:
 		g_value_set_float (value, priv->gamma);
@@ -511,6 +532,14 @@ mcm_edid_class_init (McmEdidClass *klass)
 	g_object_class_install_property (object_class, PROP_EISA_ID, pspec);
 
 	/**
+	 * McmEdid:checksum:
+	 */
+	pspec = g_param_spec_string ("checksum", NULL, NULL,
+				     NULL,
+				     G_PARAM_READABLE);
+	g_object_class_install_property (object_class, PROP_CHECKSUM, pspec);
+
+	/**
 	 * McmEdid:gamma:
 	 */
 	pspec = g_param_spec_float ("gamma", NULL, NULL,
@@ -556,6 +585,7 @@ mcm_edid_init (McmEdid *edid)
 	edid->priv->vendor_name = NULL;
 	edid->priv->serial_number = NULL;
 	edid->priv->eisa_id = NULL;
+	edid->priv->checksum = NULL;
 	edid->priv->tables = mcm_tables_new ();
 	edid->priv->pnp_id = g_new0 (gchar, 4);
 }
@@ -573,6 +603,7 @@ mcm_edid_finalize (GObject *object)
 	g_free (priv->vendor_name);
 	g_free (priv->serial_number);
 	g_free (priv->eisa_id);
+	g_free (priv->checksum);
 	g_free (priv->pnp_id);
 	g_object_unref (priv->tables);
 
