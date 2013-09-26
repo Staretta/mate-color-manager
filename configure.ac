@@ -114,13 +114,19 @@ PKG_CHECK_MODULES(GLIB, glib-2.0 >= $GLIB_REQUIRED gobject-2.0 gthread-2.0 gio-2
 PKG_CHECK_MODULES(XORG, xxf86vm xrandr)
 PKG_CHECK_MODULES(GTK, gtk+-3.0 >= $GTK_REQUIRED)
 PKG_CHECK_MODULES(MATEDESKTOP, mate-desktop-2.0 >= $MATEDESKTOP_REQUIRED)
-PKG_CHECK_MODULES(VTE, vte >= $VTE_REQUIRED)
 PKG_CHECK_MODULES(GUDEV, gudev-1.0)
 PKG_CHECK_MODULES(LCMS, lcms)
 PKG_CHECK_MODULES(X11, x11)
 
-+dnl **** Check for libnotify ****
-+PKG_CHECK_MODULES(NOTIFY, libnotify >= 0.7.0)
+dnl **** Check for VTE ****
+PKG_CHECK_MODULES(VTE, vte3 >= $VTE_REQUIRED, has_vte=yes, has_vte=no)
+AM_CONDITIONAL(GCM_USE_VTE, test x$has_vte = xyes)
+if test x$has_vte = xyes; then
+	AC_DEFINE(GCM_USE_VTE,1,[Use VTE terminal widget])
+fi
+
+dnl **** Check for libnotify ****
+PKG_CHECK_MODULES(NOTIFY, libnotify >= 0.7.0)
 
 dnl **** Check for SANE ****
 AC_ARG_ENABLE(sane, AS_HELP_STRING([--enable-sane],[Enable SANE support for scanner support]), enable_sane=$enableval,
@@ -145,6 +151,7 @@ fi
 
 AC_ARG_ENABLE(exiv, AS_HELP_STRING([--enable-exiv],[Enable EXIV support for RAW support]), enable_exiv=$enableval,
 				   enable_exiv=yes)
+
 dnl **** Check for EXIV ****
 if test x$enable_exiv != xno; then
 	PKG_CHECK_MODULES(EXIV, exiv2)
@@ -273,6 +280,7 @@ echo "
         PackageKit integration:    ${enable_packagekit}
         SANE support:              ${enable_sane}
         RAW support:               ${enable_exiv}
+        VTE support:               ${has_vte}
         building unit tests:       ${enable_tests}
 "
 
