@@ -104,24 +104,6 @@ enum {
 G_DEFINE_TYPE (McmCalibrate, mcm_calibrate, G_TYPE_OBJECT)
 
 /**
- * mcm_calibrate_precision_from_string:
- **/
-static McmCalibratePrecision
-mcm_calibrate_precision_from_string (const gchar *string)
-{
-	if (g_strcmp0 (string, "short") == 0)
-		return MCM_CALIBRATE_PRECISION_SHORT;
-	if (g_strcmp0 (string, "normal") == 0)
-		return MCM_CALIBRATE_PRECISION_NORMAL;
-	if (g_strcmp0 (string, "long") == 0)
-		return MCM_CALIBRATE_PRECISION_LONG;
-	if (g_strcmp0 (string, "ask") == 0)
-		return MCM_CALIBRATE_PRECISION_UNKNOWN;
-	egg_warning ("failed to convert to precision: %s", string);
-	return MCM_CALIBRATE_PRECISION_UNKNOWN;
-}
-
-/**
  * mcm_calibrate_get_model_fallback:
  **/
 const gchar *
@@ -610,8 +592,7 @@ mcm_calibrate_display (McmCalibrate *calibrate, GtkWindow *window, GError **erro
 	}
 
 	/* get default precision */
-	precision = g_settings_get_string (priv->settings, MCM_SETTINGS_CALIBRATION_LENGTH);
-	priv->precision = mcm_calibrate_precision_from_string (precision);
+	priv->precision = g_settings_get_enum (priv->settings, MCM_SETTINGS_CALIBRATION_LENGTH);
 	if (priv->precision == MCM_CALIBRATE_PRECISION_UNKNOWN) {
 		priv->precision = mcm_calibrate_get_precision (calibrate, error);
 		if (priv->precision == MCM_CALIBRATE_PRECISION_UNKNOWN) {
@@ -930,8 +911,7 @@ mcm_calibrate_printer (McmCalibrate *calibrate, GtkWindow *window, GError **erro
 	}
 
 	/* get default precision */
-	precision = g_settings_get_string (priv->settings, MCM_SETTINGS_CALIBRATION_LENGTH);
-	priv->precision = mcm_calibrate_precision_from_string (precision);
+	priv->precision = g_settings_get_enum (priv->settings, MCM_SETTINGS_CALIBRATION_LENGTH);
 	if (priv->precision == MCM_CALIBRATE_PRECISION_UNKNOWN) {
 		priv->precision = mcm_calibrate_get_precision (calibrate, error);
 		if (priv->precision == MCM_CALIBRATE_PRECISION_UNKNOWN) {
@@ -1103,8 +1083,7 @@ mcm_calibrate_device (McmCalibrate *calibrate, GtkWindow *window, GError **error
 	g_object_get (priv->calibrate_dialog, "reference-kind", &priv->reference_kind, NULL);
 
 	/* get default precision */
-	precision = g_settings_get_string (priv->settings, MCM_SETTINGS_CALIBRATION_LENGTH);
-	priv->precision = mcm_calibrate_precision_from_string (precision);
+	priv->precision = g_settings_get_enum (priv->settings, MCM_SETTINGS_CALIBRATION_LENGTH);
 	if (priv->precision == MCM_CALIBRATE_PRECISION_UNKNOWN) {
 		priv->precision = mcm_calibrate_get_precision (calibrate, error);
 		if (priv->precision == MCM_CALIBRATE_PRECISION_UNKNOWN) {

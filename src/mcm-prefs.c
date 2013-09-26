@@ -2819,7 +2819,6 @@ mcm_prefs_renderer_combo_changed_cb (GtkWidget *widget, gpointer data)
 {
 	gint active;
 	const gchar *key = MCM_SETTINGS_RENDERING_INTENT_DISPLAY;
-	const gchar *value;
 
 	/* no selection */
 	active = gtk_combo_box_get_active (GTK_COMBO_BOX(widget));
@@ -2830,21 +2829,19 @@ mcm_prefs_renderer_combo_changed_cb (GtkWidget *widget, gpointer data)
 		key = MCM_SETTINGS_RENDERING_INTENT_SOFTPROOF;
 
 	/* save to GSettings */
-	value = mcm_intent_to_string (active+1);
-	egg_debug ("changed rendering intent to %s", value);
-	g_settings_set_string (settings, key, value);
+	egg_debug ("changed rendering intent to %s", mcm_intent_to_string (active+1));
+	g_settings_set_enum (settings, key, active+1);
 }
 
 /**
  * mcm_prefs_setup_rendering_combobox:
  **/
 static void
-mcm_prefs_setup_rendering_combobox (GtkWidget *widget, const gchar *intent)
+mcm_prefs_setup_rendering_combobox (GtkWidget *widget, McmIntent intent)
 {
 	guint i;
 	gboolean ret = FALSE;
 	gchar *label;
-	const gchar *text;
 
 	for (i=1; i<MCM_INTENT_LAST; i++) {
 		label = g_strdup_printf ("%s - %s",
@@ -2852,8 +2849,7 @@ mcm_prefs_setup_rendering_combobox (GtkWidget *widget, const gchar *intent)
 					 mcm_intent_to_localized_description (i));
 		gtk_combo_box_append_text (GTK_COMBO_BOX (widget), label);
 		g_free (label);
-		text = mcm_intent_to_string (i);
-		if (g_strcmp0 (text, intent) == 0) {
+		if (i == intent) {
 			ret = TRUE;
 			gtk_combo_box_set_active (GTK_COMBO_BOX (widget), i-1);
 		}
@@ -2874,8 +2870,8 @@ mcm_prefs_startup_phase1_idle_cb (gpointer user_data)
 	GError *error = NULL;
 	gchar *colorspace_rgb;
 	gchar *colorspace_cmyk;
-	gchar *intent_display;
-	gchar *intent_softproof;
+	gint intent_display;
+	gint intent_softproof;
 
 	/* search the disk for profiles */
 	mcm_profile_store_search_default (profile_store);
@@ -2900,14 +2896,14 @@ mcm_prefs_startup_phase1_idle_cb (gpointer user_data)
 	/* setup rendering lists */
 	widget = GTK_WIDGET (gtk_builder_get_object (builder, "combobox_rendering_display"));
 	mcm_prefs_set_combo_simple_text (widget);
-	intent_display = g_settings_get_string (settings, MCM_SETTINGS_RENDERING_INTENT_DISPLAY);
+	intent_display = g_settings_get_enum (settings, MCM_SETTINGS_RENDERING_INTENT_DISPLAY);
 	mcm_prefs_setup_rendering_combobox (widget, intent_display);
 	g_signal_connect (G_OBJECT (widget), "changed",
 			  G_CALLBACK (mcm_prefs_renderer_combo_changed_cb), NULL);
 
 	widget = GTK_WIDGET (gtk_builder_get_object (builder, "combobox_rendering_softproof"));
 	mcm_prefs_set_combo_simple_text (widget);
-	intent_softproof = g_settings_get_string (settings, MCM_SETTINGS_RENDERING_INTENT_SOFTPROOF);
+	intent_softproof = g_settings_get_enum (settings, MCM_SETTINGS_RENDERING_INTENT_SOFTPROOF);
 	mcm_prefs_setup_rendering_combobox (widget, intent_softproof);
 	g_signal_connect (G_OBJECT (widget), "changed",
 			  G_CALLBACK (mcm_prefs_renderer_combo_changed_cb), (gpointer) "softproof");
@@ -2927,8 +2923,6 @@ mcm_prefs_startup_phase1_idle_cb (gpointer user_data)
 	g_idle_add ((GSourceFunc) mcm_prefs_startup_phase2_idle_cb, NULL);
 
 out:
-	g_free (intent_display);
-	g_free (intent_softproof);
 	g_free (colorspace_rgb);
 	g_free (colorspace_cmyk);
 	return FALSE;
@@ -3143,14 +3137,8 @@ mcm_prefs_graph_combo_changed_cb (GtkWidget *widget, gpointer data)
 	gtk_widget_set_visible (widget, active == 3);
 
 	/* save to GSettings */
-	if (active == 1)
-		value = "cie-1931-xy";
-	else if (active == 2)
-		value = "trc";
-	else if (active == 3)
-		value = "vcgt";
 	egg_debug ("changed profile-graph-type to %s", value);
-	g_settings_set_string (settings, MCM_SETTINGS_PROFILE_GRAPH_TYPE, value);
+	g_settings_set_enum (settings, MCM_SETTINGS_PROFILE_GRAPH_TYPE, active);
 }
 
 /**
@@ -3159,8 +3147,7 @@ mcm_prefs_graph_combo_changed_cb (GtkWidget *widget, gpointer data)
 static void
 mcm_prefs_setup_graph_combobox (GtkWidget *widget)
 {
-	gchar *graph_type;
-	guint active = 0;
+	gint active;
 
 	/* TRANSLATORS: combo-entry, no graph selected to be shown */
 	gtk_combo_box_append_text (GTK_COMBO_BOX(widget), _("None"));
@@ -3175,13 +3162,7 @@ mcm_prefs_setup_graph_combobox (GtkWidget *widget)
 	gtk_combo_box_append_text (GTK_COMBO_BOX(widget), _("Video card gamma table"));
 
 	/* get from settings */
-	graph_type = g_settings_get_string (settings, MCM_SETTINGS_PROFILE_GRAPH_TYPE);
-	if (g_strcmp0 (graph_type, "cie-1931-xy") == 0)
-		active = 1;
-	if (g_strcmp0 (graph_type, "trc") == 0)
-		active = 2;
-	if (g_strcmp0 (graph_type, "vcgt") == 0)
-		active = 3;
+	active = g_settings_get_enum (settings, MCM_SETTINGS_PROFILE_GRAPH_TYPE);
 	gtk_combo_box_set_active (GTK_COMBO_BOX (widget), active);
 }
 
