@@ -26,7 +26,7 @@
 #include <math.h>
 #include <glib/gstdio.h>
 #include <gudev/gudev.h>
-#include <libmateui/mate-rr.h>
+#include <libmate-desktop/mate-rr.h>
 #include <locale.h>
 #include <canberra-gtk.h>
 

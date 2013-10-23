@@ -23,7 +23,7 @@
 
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
-#include <libmateui/mate-rr.h>
+#include <libmate-desktop/mate-rr.h>
 #include <locale.h>
 
 #include "egg-debug.h"

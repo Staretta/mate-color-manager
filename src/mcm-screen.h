@@ -24,7 +24,7 @@
 
 #include <glib-object.h>
 #include <gio/gio.h>
-#include <libmateui/mate-rr.h>
+#include <libmate-desktop/mate-rr.h>
 
 G_BEGIN_DECLS
 
