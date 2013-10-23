@@ -41,13 +41,12 @@ struct McmTrcWidgetPrivate
 	McmClut			*clut;
 	guint			 chart_width;
 	guint			 chart_height;
-	cairo_t			*cr;
 	PangoLayout		*layout;
 	guint			 x_offset;
 	guint			 y_offset;
 };
 
-static gboolean mcm_trc_widget_expose (GtkWidget *trc, GdkEventExpose *event);
+static gboolean mcm_trc_widget_draw (GtkWidget *trc, cairo_t *cr);
 static void	mcm_trc_widget_finalize (GObject *object);
 
 enum
@@ -111,7 +110,7 @@ mcm_trc_widget_class_init (McmTrcWidgetClass *class)
 	GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (class);
 	GObjectClass *object_class = G_OBJECT_CLASS (class);
 
-	widget_class->expose_event = mcm_trc_widget_expose;
+	widget_class->draw = gcm_trc_widget_draw;
 	object_class->get_property = dkp_trc_get_property;
 	object_class->set_property = dkp_trc_set_property;
 	object_class->finalize = mcm_trc_widget_finalize;
@@ -354,26 +353,14 @@ mcm_trc_widget_draw_trc (GtkWidget *trc_widget, cairo_t *cr)
 }
 
 /**
- * mcm_trc_widget_expose:
+ * mcm_trc_widget_draw:
  *
  * Just repaint the entire trc widget on expose.
  **/
 static gboolean
-mcm_trc_widget_expose (GtkWidget *trc, GdkEventExpose *event)
+mcm_trc_widget_draw (GtkWidget *trc, cairo_t *cr)
 {
-	cairo_t *cr;
-
-	/* get a cairo_t */
-	cr = gdk_cairo_create (gtk_widget_get_window (trc));
-	cairo_rectangle (cr,
-			 event->area.x, event->area.y,
-			 event->area.width, event->area.height);
-	cairo_clip (cr);
-	((McmTrcWidget *)trc)->priv->cr = cr;
-
 	mcm_trc_widget_draw_trc (trc, cr);
-
-	cairo_destroy (cr);
 	return FALSE;
 }
 

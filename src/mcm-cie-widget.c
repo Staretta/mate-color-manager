@@ -44,7 +44,6 @@ struct McmCieWidgetPrivate
 	gboolean		 use_whitepoint;
 	guint			 chart_width;
 	guint			 chart_height;
-	cairo_t			*cr;
 	PangoLayout		*layout;
 	GPtrArray		*tongue_buffer;			/* min and max of the tongue shape */
 	guint			 x_offset;
@@ -395,7 +394,7 @@ typedef struct {
 	gboolean	 valid;
 } McmCieWidgetBufferItem;
 
-static gboolean mcm_cie_widget_expose (GtkWidget *cie, GdkEventExpose *event);
+static gboolean mcm_cie_widget_draw (GtkWidget *cie, cairo_t *cr);
 static void	mcm_cie_widget_finalize (GObject *object);
 
 enum
@@ -485,7 +484,7 @@ mcm_cie_widget_class_init (McmCieWidgetClass *class)
 	GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (class);
 	GObjectClass *object_class = G_OBJECT_CLASS (class);
 
-	widget_class->expose_event = mcm_cie_widget_expose;
+	widget_class->draw = mcm_cie_widget_draw;
 	object_class->get_property = dkp_cie_get_property;
 	object_class->set_property = dkp_cie_set_property;
 	object_class->finalize = mcm_cie_widget_finalize;
@@ -1148,26 +1147,14 @@ mcm_cie_widget_draw_cie (GtkWidget *cie_widget, cairo_t *cr)
 }
 
 /**
- * mcm_cie_widget_expose:
+ * mcm_cie_widget_draw:
  *
  * Just repaint the entire cie widget on expose.
  **/
 static gboolean
-mcm_cie_widget_expose (GtkWidget *cie, GdkEventExpose *event)
+mcm_cie_widget_draw (GtkWidget *cie, cairo_t *cr)
 {
-	cairo_t *cr;
-
-	/* get a cairo_t */
-	cr = gdk_cairo_create (gtk_widget_get_window (cie));
-	cairo_rectangle (cr,
-			 event->area.x, event->area.y,
-			 event->area.width, event->area.height);
-	cairo_clip (cr);
-	((McmCieWidget *)cie)->priv->cr = cr;
-
 	mcm_cie_widget_draw_cie (cie, cr);
-
-	cairo_destroy (cr);
 	return FALSE;
 }
 
