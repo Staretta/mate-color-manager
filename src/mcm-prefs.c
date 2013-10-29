@@ -2365,7 +2365,7 @@ mcm_prefs_profile_combo_changed_cb (GtkWidget *widget, gpointer data)
 
 		/* get an object of the destination */
 		dest = mcm_utils_get_profile_destination (file);
-		profile = mcm_profile_default_new ();
+		profile = mcm_profile_new ();
 		ret = mcm_profile_parse (profile, dest, &error);
 		if (!ret) {
 			/* set to first entry */

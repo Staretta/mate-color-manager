@@ -501,7 +501,7 @@ mcm_device_xrandr_apply (McmDevice *device, GError **error)
 		ret = g_file_test (filename_systemwide, G_FILE_TEST_EXISTS);
 		if (ret) {
 			egg_debug ("using systemwide %s as profile", filename_systemwide);
-			profile = mcm_profile_default_new ();
+			profile = mcm_profile_new ();
 			file = g_file_new_for_path (filename_systemwide);
 			ret = mcm_profile_parse (profile, file, error);
 			g_object_unref (file);
