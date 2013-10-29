@@ -811,93 +811,75 @@ mcm_test_print_func (void)
 	g_object_unref (print);
 }
 
-typedef struct {
-	const gchar *copyright;
-	const gchar *manufacturer;
-	const gchar *model;
-	const gchar *datetime;
-	const gchar *description;
-	const gchar *checksum;
-	McmProfileKind kind;
-	McmColorspace colorspace;
-	gfloat luminance;
-	gboolean has_vcgt;
-} McmProfileTestData;
-
 static void
-mcm_test_profile_test_parse_file (const gchar *datafile, McmProfileTestData *test_data)
+mcm_test_profile_func (void)
 {
 	gchar *filename = NULL;
+	McmProfile *profile;
+	GFile *file;
+	McmClut *clut;
 	gboolean ret;
 	GError *error = NULL;
-	McmProfile *profile;
 	McmXyz *xyz;
-	gfloat luminance;
-	GFile *file;
+
+	/* bluish test */
+	filename = mcm_test_get_data_file ("bluish.icc");
 
 	profile = MCM_PROFILE(mcm_profile_new ());
-	g_assert (profile != NULL);
-
-	filename = mcm_test_get_data_file (datafile);
-	g_assert ((filename != NULL));
 
 	file = g_file_new_for_path (filename);
 	ret = mcm_profile_parse (profile, file, &error);
 	g_assert_no_error (error);
 	g_assert (ret);
 	g_object_unref (file);
+	g_free (filename);
 
-	g_assert_cmpstr (mcm_profile_get_copyright (profile), ==, test_data->copyright);
-	g_assert_cmpstr (mcm_profile_get_manufacturer (profile), ==, test_data->manufacturer);
-	g_assert_cmpstr (mcm_profile_get_model (profile), ==, test_data->model);
-	g_assert_cmpstr (mcm_profile_get_datetime (profile), ==, test_data->datetime);
-	g_assert_cmpstr (mcm_profile_get_description (profile), ==, test_data->description);
-	g_assert_cmpstr (mcm_profile_get_checksum (profile), ==, test_data->checksum);
-	g_assert_cmpint (mcm_profile_get_kind (profile), ==, test_data->kind);
-	g_assert_cmpint (mcm_profile_get_colorspace (profile), ==, test_data->colorspace);
-	g_assert_cmpint (mcm_profile_get_has_vcgt (profile), ==, test_data->has_vcgt);
+	/* get CLUT */
+	clut = mcm_profile_generate_vcgt (profile, 256);
+	g_assert (clut != NULL);
+	g_assert_cmpint (mcm_clut_get_size (clut), ==, 256);
 
+	g_assert_cmpstr (mcm_profile_get_copyright (profile), ==, "Copyright (c) 1998 Hewlett-Packard Company");
+	g_assert_cmpstr (mcm_profile_get_manufacturer (profile), ==, "IEC http://www.iec.ch");
+	g_assert_cmpstr (mcm_profile_get_model (profile), ==, "IEC 61966-2.1 Default RGB colour space - sRGB");
+	g_assert_cmpstr (mcm_profile_get_datetime (profile), ==, "February  9 1998, 06:49:00 AM");
+	g_assert_cmpstr (mcm_profile_get_description (profile), ==, "Blueish Test");
+	g_assert_cmpstr (mcm_profile_get_checksum (profile), ==, "8e2aed5dac6f8b5d8da75610a65b7f27");
+	g_assert_cmpint (mcm_profile_get_kind (profile), ==, MCM_PROFILE_KIND_DISPLAY_DEVICE);
+	g_assert_cmpint (mcm_profile_get_colorspace (profile), ==, MCM_COLORSPACE_RGB);
+	g_assert (mcm_profile_get_has_vcgt (profile));
+
+	/* get extra data */
 	g_object_get (profile,
 		      "red", &xyz,
 		      NULL);
-	luminance = mcm_xyz_get_x (xyz);
-	g_assert_cmpfloat (fabs (luminance - test_data->luminance), <, 0.001);
+	g_assert_cmpfloat (fabs (mcm_xyz_get_x (xyz) - 0.648454), <, 0.01);
 
 	g_object_unref (xyz);
+	g_object_unref (clut);
 	g_object_unref (profile);
-	g_free (filename);
-}
-
-static void
-mcm_test_profile_func (void)
-{
-	McmProfileTestData test_data;
-
-	/* bluish test */
-	test_data.copyright = "Copyright (c) 1998 Hewlett-Packard Company";
-	test_data.manufacturer = "IEC http://www.iec.ch";
-	test_data.model = "IEC 61966-2.1 Default RGB colour space - sRGB";
-	test_data.description = "Blueish Test";
-	test_data.kind = MCM_PROFILE_KIND_DISPLAY_DEVICE;
-	test_data.colorspace = MCM_COLORSPACE_RGB;
-	test_data.luminance = 0.648454;
-	test_data.datetime = "February  9 1998, 06:49:00 AM";
-	test_data.checksum = "8e2aed5dac6f8b5d8da75610a65b7f27";
-	test_data.has_vcgt = TRUE;
-	mcm_test_profile_test_parse_file ("bluish.icc", &test_data);
 
 	/* Adobe test */
-	test_data.copyright = "Copyright (c) 1998 Hewlett-Packard Company Modified using Adobe Gamma";
-	test_data.manufacturer = "IEC http://www.iec.ch";
-	test_data.model = "IEC 61966-2.1 Default RGB colour space - sRGB";
-	test_data.description = "ADOBEGAMMA-Test";
-	test_data.kind = MCM_PROFILE_KIND_DISPLAY_DEVICE;
-	test_data.colorspace = MCM_COLORSPACE_RGB;
-	test_data.luminance = 0.648446;
-	test_data.datetime = "August 16 2005, 09:49:54 PM";
-	test_data.checksum = "bd847723f676e2b846daaf6759330624";
-	test_data.has_vcgt = TRUE;
-	mcm_test_profile_test_parse_file ("AdobeGammaTest.icm", &test_data);
+	filename = mcm_test_get_data_file ("AdobeGammaTest.icm");
+	profile = MCM_PROFILE(mcm_profile_new ());
+	file = g_file_new_for_path (filename);
+	ret = mcm_profile_parse (profile, file, &error);
+	g_assert_no_error (error);
+	g_assert (ret);
+	g_object_unref (file);
+	g_free (filename);
+
+	g_assert_cmpstr (mcm_profile_get_copyright (profile), ==, "Copyright (c) 1998 Hewlett-Packard Company Modified using Adobe Gamma");
+	g_assert_cmpstr (mcm_profile_get_manufacturer (profile), ==, "IEC http://www.iec.ch");
+	g_assert_cmpstr (mcm_profile_get_model (profile), ==, "IEC 61966-2.1 Default RGB colour space - sRGB");
+	g_assert_cmpstr (mcm_profile_get_datetime (profile), ==, "August 16 2005, 09:49:54 PM");
+	g_assert_cmpstr (mcm_profile_get_description (profile), ==, "ADOBEGAMMA-Test");
+	g_assert_cmpstr (mcm_profile_get_checksum (profile), ==, "bd847723f676e2b846daaf6759330624");
+	g_assert_cmpint (mcm_profile_get_kind (profile), ==, MCM_PROFILE_KIND_DISPLAY_DEVICE);
+	g_assert_cmpint (mcm_profile_get_colorspace (profile), ==, MCM_COLORSPACE_RGB);
+	g_assert (mcm_profile_get_has_vcgt (profile));
+
+	g_object_unref (profile);
 }
 
 static void
