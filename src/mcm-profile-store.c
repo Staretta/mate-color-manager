@@ -328,7 +328,6 @@ mcm_profile_store_search_by_path (McmProfileStore *profile_store, const gchar *p
 	if (dir == NULL) {
 		egg_debug ("failed to open: %s", error->message);
 		g_error_free (error);
-		ret = FALSE;
 		goto out;
 	}
 
