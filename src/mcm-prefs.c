@@ -2149,7 +2149,7 @@ mcm_prefs_profiles_treeview_clicked_cb (GtkTreeSelection *selection, McmPrefsDat
 	} else {
 		gtk_widget_show (widget);
 		widget = GTK_WIDGET (gtk_builder_get_object (prefsdata->builder, "label_size"));
-		size_text = g_format_size_for_display (filesize);
+		size_text = g_format_size (filesize);
 		gtk_label_set_label (GTK_LABEL (widget), size_text);
 	}
 
