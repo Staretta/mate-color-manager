@@ -50,17 +50,6 @@ struct _McmProfile
 struct _McmProfileClass
 {
 	GObjectClass	 parent_class;
-	gboolean	 (*parse_data)		(McmProfile	*profile,
-						 const guint8	*data,
-						 gsize		 length,
-						 GError		**error);
-	gboolean	 (*save)		(McmProfile	*profile,
-						 const gchar	*filename,
-						 GError		**error);
-	McmClut		*(*generate_vcgt)	(McmProfile	*profile,
-						 guint		 size);
-	McmClut		*(*generate_curve)	(McmProfile	*profile,
-						 guint		 size);
 
 	/* padding for future expansion */
 	void (*_mcm_reserved1) (void);
@@ -72,7 +61,7 @@ struct _McmProfileClass
 
 GType		 mcm_profile_get_type		  	(void);
 McmProfile	*mcm_profile_new			(void);
-McmProfile	*mcm_profile_default_new		(void);
+McmProfile	*mcm_profile_new			(void);
 gboolean	 mcm_profile_parse			(McmProfile	*profile,
 							 GFile		*file,
 							 GError		**error);

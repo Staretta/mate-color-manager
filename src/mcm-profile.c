@@ -32,13 +32,13 @@
 #include <glib-object.h>
 #include <glib/gi18n.h>
 #include <gio/gio.h>
+#include <lcms2.h>
 
 #include "egg-debug.h"
 
 #include "mcm-profile.h"
 #include "mcm-utils.h"
 #include "mcm-xyz.h"
-#include "mcm-profile-lcms1.h"
 
 static void     mcm_profile_finalize	(GObject     *object);
 
@@ -51,6 +51,7 @@ static void     mcm_profile_finalize	(GObject     *object);
  **/
 struct _McmProfilePrivate
 {
+	gboolean		 loaded;
 	McmProfileKind		 kind;
 	McmColorspace		 colorspace;
 	guint			 size;
@@ -69,6 +70,12 @@ struct _McmProfilePrivate
 	McmXyz			*green;
 	McmXyz			*blue;
 	GFileMonitor		*monitor;
+	gboolean		 has_mlut;
+	cmsHPROFILE		 lcms_profile;
+	McmClutData		*vcgt_data;
+	guint			 vcgt_data_size;
+	McmClutData		*mlut_data;
+	guint			 mlut_data_size;
 };
 
 enum {
@@ -128,7 +135,7 @@ mcm_profile_set_description (McmProfile *profile, const gchar *description)
 		if (priv->filename != NULL) {
 			priv->description = g_path_get_basename (priv->filename);
 		} else {
-			/* TRANSLATORS: this is where the ICC profile_lcms1 has no description */
+			/* TRANSLATORS: this is where the ICC profile has no description */
 			priv->description = g_strdup (_("Missing description"));
 		}
 	}
@@ -430,28 +437,254 @@ gboolean
 mcm_profile_parse_data (McmProfile *profile, const guint8 *data, gsize length, GError **error)
 {
 	gboolean ret = FALSE;
+	cmsProfileClassSignature profile_class;
+	cmsColorSpaceSignature color_space;
+	McmColorspace colorspace;
+	McmProfileKind profile_kind;
+	cmsCIEXYZ *cie_xyz;
+	cmsCIEXYZTRIPLE cie_illum;
+	struct tm created;
+	cmsHPROFILE xyz_profile;
+	cmsHTRANSFORM transform;
+	gchar *text = NULL;
 	gchar *checksum = NULL;
+	McmXyz *xyz;
 	McmProfilePrivate *priv = profile->priv;
-	McmProfileClass *klass = MCM_PROFILE_GET_CLASS (profile);
+
+	g_return_val_if_fail (MCM_IS_PROFILE (profile), FALSE);
+	g_return_val_if_fail (data != NULL, FALSE);
+	g_return_val_if_fail (priv->loaded == FALSE, FALSE);
 
 	/* save the length */
 	priv->size = length;
+	priv->loaded = TRUE;
 
-	/* do we have support */
-	if (klass->parse_data == NULL) {
-		g_set_error_literal (error, 1, 0, "no support");
+	/* ensure we have the header */
+	if (length < 0x84) {
+		g_set_error (error, 1, 0, "profile was not valid (file size too small)");
 		goto out;
 	}
 
-	/* proxy */
-	ret = klass->parse_data (profile, data, length, error);
-	if (!ret)
+	/* load profile into lcms */
+	priv->lcms_profile = cmsOpenProfileFromMem (data, length);
+	if (priv->lcms_profile == NULL) {
+		g_set_error_literal (error, 1, 0, "failed to load: not an ICC profile");
 		goto out;
+	}
+
+	/* get white point */
+	cie_xyz = cmsReadTag (priv->lcms_profile, cmsSigMediaWhitePointTag);
+	if (cie_xyz != NULL) {
+		g_object_set (priv->white,
+			      "cie-x", cie_xyz->X,
+			      "cie-y", cie_xyz->Y,
+			      "cie-z", cie_xyz->Z,
+			      NULL);
+	} else {
+		mcm_xyz_clear (priv->white);
+		egg_warning ("failed to get white point");
+	}
+
+	/* get black point */
+	cie_xyz = cmsReadTag (priv->lcms_profile, cmsSigMediaBlackPointTag);
+	if (cie_xyz != NULL) {
+		g_object_set (priv->black,
+			      "cie-x", cie_xyz->X,
+			      "cie-y", cie_xyz->Y,
+			      "cie-z", cie_xyz->Z,
+			      NULL);
+	} else {
+		mcm_xyz_clear (priv->black);
+		egg_warning ("failed to get black point");
+	}
+
+	/* get the profile kind */
+	profile_class = cmsGetDeviceClass (priv->lcms_profile);
+	switch (profile_class) {
+	case cmsSigInputClass:
+		profile_kind = MCM_PROFILE_KIND_INPUT_DEVICE;
+		break;
+	case cmsSigDisplayClass:
+		profile_kind = MCM_PROFILE_KIND_DISPLAY_DEVICE;
+		break;
+	case cmsSigOutputClass:
+		profile_kind = MCM_PROFILE_KIND_OUTPUT_DEVICE;
+		break;
+	case cmsSigLinkClass:
+		profile_kind = MCM_PROFILE_KIND_DEVICELINK;
+		break;
+	case cmsSigColorSpaceClass:
+		profile_kind = MCM_PROFILE_KIND_COLORSPACE_CONVERSION;
+		break;
+	case cmsSigAbstractClass:
+		profile_kind = MCM_PROFILE_KIND_ABSTRACT;
+		break;
+	case cmsSigNamedColorClass:
+		profile_kind = MCM_PROFILE_KIND_NAMED_COLOR;
+		break;
+	default:
+		profile_kind = MCM_PROFILE_KIND_UNKNOWN;
+	}
+	mcm_profile_set_kind (profile, profile_kind);
+
+	/* get colorspace */
+	color_space = cmsGetColorSpace (priv->lcms_profile);
+	switch (color_space) {
+	case cmsSigXYZData:
+		colorspace = MCM_COLORSPACE_XYZ;
+		break;
+	case cmsSigLabData:
+		colorspace = MCM_COLORSPACE_LAB;
+		break;
+	case cmsSigLuvData:
+		colorspace = MCM_COLORSPACE_LUV;
+		break;
+	case cmsSigYCbCrData:
+		colorspace = MCM_COLORSPACE_YCBCR;
+		break;
+	case cmsSigYxyData:
+		colorspace = MCM_COLORSPACE_YXY;
+		break;
+	case cmsSigRgbData:
+		colorspace = MCM_COLORSPACE_RGB;
+		break;
+	case cmsSigGrayData:
+		colorspace = MCM_COLORSPACE_GRAY;
+		break;
+	case cmsSigHsvData:
+		colorspace = MCM_COLORSPACE_HSV;
+		break;
+	case cmsSigCmykData:
+		colorspace = MCM_COLORSPACE_CMYK;
+		break;
+	case cmsSigCmyData:
+		colorspace = MCM_COLORSPACE_CMY;
+		break;
+	default:
+		colorspace = MCM_COLORSPACE_UNKNOWN;
+	}
+	mcm_profile_set_colorspace (profile, colorspace);
+
+	/* get the illuminants by running it through the profile */
+	if (color_space == cmsSigRgbData) {
+		gdouble rgb_values[3];
+
+		/* create a transform from profile to XYZ */
+		xyz_profile = cmsCreateXYZProfile ();
+		transform = cmsCreateTransform (priv->lcms_profile, TYPE_RGB_DBL, xyz_profile, TYPE_XYZ_DBL, INTENT_PERCEPTUAL, 0);
+		if (transform != NULL) {
+
+			/* red */
+			rgb_values[0] = 1.0;
+			rgb_values[1] = 0.0;
+			rgb_values[2] = 0.0;
+			cmsDoTransform (transform, rgb_values, &cie_illum.Red, 1);
+
+			/* green */
+			rgb_values[0] = 0.0;
+			rgb_values[1] = 1.0;
+			rgb_values[2] = 0.0;
+			cmsDoTransform (transform, rgb_values, &cie_illum.Green, 1);
+
+			/* blue */
+			rgb_values[0] = 0.0;
+			rgb_values[1] = 0.0;
+			rgb_values[2] = 1.0;
+			cmsDoTransform (transform, rgb_values, &cie_illum.Blue, 1);
+
+			/* we're done */
+			cmsDeleteTransform (transform);
+			ret = TRUE;
+		}
+
+		/* no more need for the output profile */
+		cmsCloseProfile (xyz_profile);
+	}
+
+	/* we've got valid values */
+	if (ret) {
+		/* red */
+		xyz = mcm_xyz_new ();
+		g_object_set (xyz,
+			      "cie-x", cie_illum.Red.X,
+			      "cie-y", cie_illum.Red.Y,
+			      "cie-z", cie_illum.Red.Z,
+			      NULL);
+		g_object_set (profile,
+			      "red", xyz,
+			      NULL);
+		g_object_unref (xyz);
+
+		/* green */
+		xyz = mcm_xyz_new ();
+		g_object_set (xyz,
+			      "cie-x", cie_illum.Green.X,
+			      "cie-y", cie_illum.Green.Y,
+			      "cie-z", cie_illum.Green.Z,
+			      NULL);
+		g_object_set (profile,
+			      "green", xyz,
+			      NULL);
+		g_object_unref (xyz);
+
+		/* blue */
+		xyz = mcm_xyz_new ();
+		g_object_set (xyz,
+			      "cie-x", cie_illum.Blue.X,
+			      "cie-y", cie_illum.Blue.Y,
+			      "cie-z", cie_illum.Blue.Z,
+			      NULL);
+		g_object_set (profile,
+			      "blue", xyz,
+			      NULL);
+		g_object_unref (xyz);
+	} else {
+		egg_debug ("failed to get luminance values");
+	}
+
+	/* get the profile created time and date */
+	ret = cmsGetHeaderCreationDateTime (priv->lcms_profile, &created);
+	if (ret) {
+		text = mcm_utils_format_date_time (&created);
+		mcm_profile_set_datetime (profile, text);
+		g_free (text);
+	}
+
+	/* do we have vcgt */
+	ret = cmsIsTag (priv->lcms_profile, cmsSigVcgtTag);
+	mcm_profile_set_has_vcgt (profile, ret);
+
+	/* allocate temporary buffer */
+	text = g_new0 (gchar, 1024);
+
+	/* get description */
+	ret = cmsGetProfileInfoASCII (priv->lcms_profile, cmsInfoDescription, "en", "US", text, 1024);
+	if (ret)
+		mcm_profile_set_description (profile, text);
+
+	/* get copyright */
+	ret = cmsGetProfileInfoASCII (priv->lcms_profile, cmsInfoCopyright, "en", "US", text, 1024);
+	if (ret)
+		mcm_profile_set_copyright (profile, text);
+
+	/* get description */
+	ret = cmsGetProfileInfoASCII (priv->lcms_profile, cmsInfoManufacturer, "en", "US", text, 1024);
+	if (ret)
+		mcm_profile_set_manufacturer (profile, text);
+
+	/* get description */
+	ret = cmsGetProfileInfoASCII (priv->lcms_profile, cmsInfoModel, "en", "US", text, 1024);
+	if (ret)
+		mcm_profile_set_model (profile, text);
+
+	/* success */
+	ret = TRUE;
 
 	/* generate and set checksum */
 	checksum = g_compute_checksum_for_data (G_CHECKSUM_MD5, (const guchar *) data, length);
 	mcm_profile_set_checksum (profile, checksum);
 out:
+	g_free (text);
 	g_free (checksum);
 	return ret;
 }
@@ -511,7 +744,6 @@ mcm_profile_save (McmProfile *profile, const gchar *filename, GError **error)
 {
 	gboolean ret = FALSE;
 	McmProfilePrivate *priv = profile->priv;
-	McmProfileClass *klass = MCM_PROFILE_GET_CLASS (profile);
 
 	/* not loaded */
 	if (priv->size == 0) {
@@ -519,14 +751,9 @@ mcm_profile_save (McmProfile *profile, const gchar *filename, GError **error)
 		goto out;
 	}
 
-	/* do we have support */
-	if (klass->save == NULL) {
-		g_set_error_literal (error, 1, 0, "no support");
-		goto out;
-	}
-
-	/* proxy */
-	ret = klass->save (profile, filename, error);
+	/* save, TODO: get error */
+	cmsSaveProfileToFile (priv->lcms_profile, filename);
+	ret = TRUE;
 out:
 	return ret;
 }
@@ -540,15 +767,37 @@ McmClut *
 mcm_profile_generate_vcgt (McmProfile *profile, guint size)
 {
 	McmClut *clut = NULL;
-	McmProfileClass *klass = MCM_PROFILE_GET_CLASS (profile);
+	McmClutData *tmp;
+	GPtrArray *array = NULL;
+	McmProfilePrivate *priv = profile->priv;
+	const cmsToneCurve **vcgt;
+	cmsFloat32Number in;
+	guint i;
 
-	/* do we have support */
-	if (klass->generate_vcgt == NULL)
+	/* get tone curves from profile */
+	vcgt = cmsReadTag (priv->lcms_profile, cmsSigVcgtType);
+	if (vcgt == NULL || vcgt[0] == NULL) {
+		egg_debug ("profile does not have any VCGT data");
 		goto out;
+	}
 
-	/* proxy */
-	clut = klass->generate_vcgt (profile, size);
+	/* create array */
+	array = g_ptr_array_new_with_free_func (g_free);
+	for (i=0; i<size; i++) {
+		in = (gdouble) i / (gdouble) (size - 1);
+		tmp = g_new0 (McmClutData, 1);
+		tmp->red = cmsEvalToneCurveFloat(vcgt[0], in) * (gdouble) 0xffff;
+		tmp->green = cmsEvalToneCurveFloat(vcgt[1], in) * (gdouble) 0xffff;
+		tmp->blue = cmsEvalToneCurveFloat(vcgt[2], in) * (gdouble) 0xffff;
+		g_ptr_array_add (array, tmp);
+	}
+
+	/* create new scaled CLUT */
+	clut = mcm_clut_new ();
+	mcm_clut_set_source_array (clut, array);
 out:
+	if (array != NULL)
+		g_ptr_array_unref (array);
 	return clut;
 }
 
@@ -561,15 +810,89 @@ McmClut *
 mcm_profile_generate_curve (McmProfile *profile, guint size)
 {
 	McmClut *clut = NULL;
-	McmProfileClass *klass = MCM_PROFILE_GET_CLASS (profile);
+	gdouble *values_in = NULL;
+	gdouble *values_out = NULL;
+	guint i;
+	McmClutData *data;
+	GPtrArray *array = NULL;
+	gfloat divamount;
+	gfloat divadd;
+	guint component_width;
+	cmsHPROFILE srgb_profile = NULL;
+	cmsHTRANSFORM transform = NULL;
+	guint type;
+	McmColorspace colorspace;
+	McmProfilePrivate *priv = profile->priv;
 
-	/* do we have support */
-	if (klass->generate_curve == NULL)
-		goto out;
+	/* run through the profile */
+	colorspace = mcm_profile_get_colorspace (profile);
+	if (colorspace == MCM_COLORSPACE_RGB) {
 
-	/* proxy */
-	clut = klass->generate_curve (profile, size);
+		/* RGB */
+		component_width = 3;
+		type = TYPE_RGB_DBL;
+
+		/* create input array */
+		values_in = g_new0 (gdouble, size * 3 * component_width);
+		divamount = 1.0f / (gfloat) (size - 1);
+		for (i=0; i<size; i++) {
+			divadd = divamount * (gfloat) i;
+
+			/* red component */
+			values_in[(i * 3 * component_width)+0] = divadd;
+			values_in[(i * 3 * component_width)+1] = 0.0f;
+			values_in[(i * 3 * component_width)+2] = 0.0f;
+
+			/* green component */
+			values_in[(i * 3 * component_width)+3] = 0.0f;
+			values_in[(i * 3 * component_width)+4] = divadd;
+			values_in[(i * 3 * component_width)+5] = 0.0f;
+
+			/* blue component */
+			values_in[(i * 3 * component_width)+6] = 0.0f;
+			values_in[(i * 3 * component_width)+7] = 0.0f;
+			values_in[(i * 3 * component_width)+8] = divadd;
+		}
+	}
+
+	/* do each transform */
+	if (values_in != NULL) {
+		/* create output array */
+		values_out = g_new0 (gdouble, size * 3 * component_width);
+
+		/* create a transform from profile to sRGB */
+		srgb_profile = cmsCreate_sRGBProfile ();
+		transform = cmsCreateTransform (priv->lcms_profile, type, srgb_profile, TYPE_RGB_DBL, INTENT_PERCEPTUAL, 0);
+		if (transform == NULL)
+			goto out;
+
+		/* do transform */
+		cmsDoTransform (transform, values_in, values_out, size * 3);
+
+		/* create output array */
+		array = g_ptr_array_new_with_free_func (g_free);
+
+		for (i=0; i<size; i++) {
+			data = g_new0 (McmClutData, 1);
+
+			data->red = values_out[(i * 3 * component_width)+0] * (gfloat) 0xffff;
+			data->green = values_out[(i * 3 * component_width)+4] * (gfloat) 0xffff;
+			data->blue = values_out[(i * 3 * component_width)+8] * (gfloat) 0xffff;
+			g_ptr_array_add (array, data);
+		}
+		clut = mcm_clut_new ();
+		mcm_clut_set_source_array (clut, array);
+	}
+
 out:
+	g_free (values_in);
+	g_free (values_out);
+	if (array != NULL)
+		g_ptr_array_unref (array);
+	if (transform != NULL)
+		cmsDeleteTransform (transform);
+	if (srgb_profile != NULL)
+		cmsCloseProfile (srgb_profile);
 	return clut;
 }
 
@@ -590,6 +913,15 @@ mcm_profile_file_monitor_changed_cb (GFileMonitor *monitor, GFile *file, GFile *
 	mcm_profile_set_filename (profile, NULL);
 out:
 	return;
+}
+
+/**
+ * mcm_profile_error_cb:
+ **/
+static void
+mcm_profile_error_cb (cmsContext ContextID, cmsUInt32Number errorcode, const char *text)
+{
+	egg_warning ("LCMS error %i: %s", errorcode, text);
 }
 
 /**
@@ -878,6 +1210,8 @@ static void
 mcm_profile_init (McmProfile *profile)
 {
 	profile->priv = MCM_PROFILE_GET_PRIVATE (profile);
+	profile->priv->vcgt_data = NULL;
+	profile->priv->mlut_data = NULL;
 	profile->priv->can_delete = FALSE;
 	profile->priv->monitor = NULL;
 	profile->priv->kind = MCM_PROFILE_KIND_UNKNOWN;
@@ -887,6 +1221,9 @@ mcm_profile_init (McmProfile *profile)
 	profile->priv->red = mcm_xyz_new ();
 	profile->priv->green = mcm_xyz_new ();
 	profile->priv->blue = mcm_xyz_new ();
+
+	/* setup LCMS */
+	cmsSetLogErrorHandler (mcm_profile_error_cb);
 }
 
 /**
@@ -905,6 +1242,8 @@ mcm_profile_finalize (GObject *object)
 	g_free (priv->model);
 	g_free (priv->datetime);
 	g_free (priv->checksum);
+	g_free (priv->vcgt_data);
+	g_free (priv->mlut_data);
 	g_object_unref (priv->white);
 	g_object_unref (priv->black);
 	g_object_unref (priv->red);
@@ -912,6 +1251,9 @@ mcm_profile_finalize (GObject *object)
 	g_object_unref (priv->blue);
 	if (priv->monitor != NULL)
 		g_object_unref (priv->monitor);
+
+	if (priv->lcms_profile != NULL)
+		cmsCloseProfile (priv->lcms_profile);
 
 	G_OBJECT_CLASS (mcm_profile_parent_class)->finalize (object);
 }
@@ -927,18 +1269,5 @@ mcm_profile_new (void)
 	McmProfile *profile;
 	profile = g_object_new (MCM_TYPE_PROFILE, NULL);
 	return MCM_PROFILE (profile);
-}
-
-/**
- * mcm_profile_default_new:
- *
- * Return value: a new McmProfile object.
- **/
-McmProfile *
-mcm_profile_default_new (void)
-{
-	McmProfile *profile = NULL;
-	profile = MCM_PROFILE (mcm_profile_lcms1_new ());
-	return profile;
 }
 

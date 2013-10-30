@@ -110,7 +110,7 @@ main (int argc, char **argv)
 	}
 
 	/* load profile */
-	profile = mcm_profile_default_new ();
+	profile = mcm_profile_new ();
 	file = g_file_new_for_path (files[0]);
 	ret = mcm_profile_parse (profile, file, &error);
 	if (!ret) {

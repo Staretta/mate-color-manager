@@ -553,7 +553,7 @@ mcm_device_set_default_profile_filename (McmDevice *device, const gchar *profile
 
 	/* create new list */
 	array = g_ptr_array_new_with_free_func ((GDestroyNotify) g_object_unref);
-	profile = mcm_profile_default_new ();
+	profile = mcm_profile_new ();
 
 	/* TODO: parse here? */
 	file = g_file_new_for_path (profile_filename);
@@ -646,7 +646,7 @@ mcm_device_load (McmDevice *device, GError **error)
 	if (profile_filenames != NULL) {
 		for (i=0; profile_filenames[i] != NULL; i++) {
 			file_tmp = g_file_new_for_path (profile_filenames[i]);
-			profile = mcm_profile_default_new ();
+			profile = mcm_profile_new ();
 			ret = mcm_profile_parse (profile, file_tmp, &error_local);
 			if (ret) {
 				g_ptr_array_add (priv->profiles, g_object_ref (profile));

@@ -80,8 +80,6 @@ libmcmshared_a_SOURCES =		\
 	mcm-gamma-widget.h			\
 	mcm-profile-store.c			\
 	mcm-profile-store.h			\
-	mcm-profile-lcms1.c			\
-	mcm-profile-lcms1.h			\
 	mcm-profile.c				\
 	mcm-profile.h 				\
 	mcm-calibrate.c 			\
