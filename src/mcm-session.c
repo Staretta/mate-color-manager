@@ -692,11 +692,6 @@ main (int argc, char *argv[])
 	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
 	textdomain (GETTEXT_PACKAGE);
 
-	if (! g_thread_supported ())
-		g_thread_init (NULL);
-	g_type_init ();
-	notify_init ("mate-color-manager");
-
 	/* TRANSLATORS: program name, a session wide daemon to watch for updates and changing system state */
 	g_set_application_name (_("Color Management"));
 	context = g_option_context_new (NULL);
@@ -715,7 +710,6 @@ main (int argc, char *argv[])
 
 	/* monitor devices as they are added */
 	client = mcm_client_new ();
-	mcm_client_set_use_threads (client, TRUE);
 	g_signal_connect (client, "added", G_CALLBACK (mcm_session_added_cb), NULL);
 	g_signal_connect (client, "added", G_CALLBACK (mcm_session_client_changed_cb), NULL);
 	g_signal_connect (client, "removed", G_CALLBACK (mcm_session_client_changed_cb), NULL);

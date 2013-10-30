@@ -3366,7 +3366,6 @@ main (int argc, char **argv)
 
 	/* use a device client array */
 	mcm_client = mcm_client_new ();
-	mcm_client_set_use_threads (mcm_client, TRUE);
 	g_signal_connect (mcm_client, "added", G_CALLBACK (mcm_prefs_added_cb), NULL);
 	g_signal_connect (mcm_client, "removed", G_CALLBACK (mcm_prefs_removed_cb), NULL);
 	g_signal_connect (mcm_client, "changed", G_CALLBACK (mcm_prefs_changed_cb), NULL);

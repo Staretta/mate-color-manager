@@ -90,8 +90,6 @@ gboolean	 mcm_client_coldplug				(McmClient		*client,
 								 McmClientColdplug	 coldplug,
 								 GError			**error);
 GPtrArray	*mcm_client_get_devices				(McmClient		*client);
-void		 mcm_client_set_use_threads			(McmClient		*client,
-								 gboolean		 use_threads);
 gboolean	 mcm_client_get_loading				(McmClient		*client);
 
 G_END_DECLS

@@ -59,7 +59,6 @@ static void     mcm_client_finalize	(GObject     *object);
 static void mcm_client_xrandr_add (McmClient *client, MateRROutput *output);
 #ifdef HAVE_SANE
 static gboolean mcm_client_coldplug_devices_sane (McmClient *client, GError **error);
-static gpointer mcm_client_coldplug_devices_sane_thrd (McmClient *client);
 #endif
 /**
  * McmClientPrivate:
@@ -76,7 +75,6 @@ struct _McmClientPrivate
 	http_t				*http;
 	gboolean			 loading;
 	guint				 loading_refcount;
-	gboolean			 use_threads;
 	gboolean			 init_cups;
 	gboolean			 init_sane;
 	guint				 refresh_id;
@@ -103,16 +101,6 @@ static gpointer mcm_client_object = NULL;
 G_DEFINE_TYPE (McmClient, mcm_client, G_TYPE_OBJECT)
 
 #define	MCM_CLIENT_SANE_REMOVED_TIMEOUT		200	/* ms */
-
-/**
- * mcm_client_set_use_threads:
- **/
-void
-mcm_client_set_use_threads (McmClient *client, gboolean use_threads)
-{
-	client->priv->use_threads = use_threads;
-	g_object_notify (G_OBJECT (client), "use-threads");
-}
 
 /**
  * mcm_client_set_loading:
@@ -381,7 +369,6 @@ mcm_client_sane_refresh_cb (McmClient *client)
 {
 	gboolean ret;
 	GError *error = NULL;
-	GThread *thread;
 
 	/* inform UI if we are loading devices still */
 	client->priv->loading_refcount = 1;
@@ -389,20 +376,11 @@ mcm_client_sane_refresh_cb (McmClient *client)
 
 	/* rescan */
 	egg_debug ("rescanning sane");
-	if (client->priv->use_threads) {
-		thread = g_thread_create ((GThreadFunc) mcm_client_coldplug_devices_sane_thrd, client, FALSE, &error);
-		if (thread == NULL) {
-			egg_debug ("failed to rescan sane devices: %s", error->message);
-			g_error_free (error);
-			goto out;
-		}
-	} else {
-		ret = mcm_client_coldplug_devices_sane (client, &error);
-		if (!ret) {
-			egg_debug ("failed to rescan sane devices: %s", error->message);
-			g_error_free (error);
-			goto out;
-		}
+	ret = mcm_client_coldplug_devices_sane (client, &error);
+	if (!ret) {
+		g_debug ("failed to rescan sane devices: %s", error->message);
+		g_error_free (error);
+		goto out;
 	}
 out:
 	return FALSE;
@@ -518,16 +496,6 @@ mcm_client_coldplug_devices_udev (McmClient *client, GError **error)
 	mcm_client_done_loading (client);
 
 	return TRUE;
-}
-
-/**
- * mcm_client_coldplug_devices_udev_thrd:
- **/
-static gpointer
-mcm_client_coldplug_devices_udev_thrd (McmClient *client)
-{
-	mcm_client_coldplug_devices_udev (client, NULL);
-	return NULL;
 }
 
 /**
@@ -773,16 +741,6 @@ mcm_client_coldplug_devices_cups (McmClient *client, GError **error)
 	return TRUE;
 }
 
-/**
- * mcm_client_coldplug_devices_cups_thrd:
- **/
-static gpointer
-mcm_client_coldplug_devices_cups_thrd (McmClient *client)
-{
-	mcm_client_coldplug_devices_cups (client, NULL);
-	return NULL;
-}
-
 #ifdef HAVE_SANE
 /**
  * mcm_client_sane_add:
@@ -862,15 +820,6 @@ out:
 	return ret;
 }
 
-/**
- * mcm_client_coldplug_devices_sane_thrd:
- **/
-static gpointer
-mcm_client_coldplug_devices_sane_thrd (McmClient *client)
-{
-	mcm_client_coldplug_devices_sane (client, NULL);
-	return NULL;
-}
 #endif
 
 /**
@@ -1089,7 +1038,6 @@ gboolean
 mcm_client_coldplug (McmClient *client, McmClientColdplug coldplug, GError **error)
 {
 	gboolean ret = TRUE;
-	GThread *thread;
 	gboolean enable;
 
 	g_return_val_if_fail (MCM_IS_CLIENT (client), FALSE);
@@ -1113,15 +1061,9 @@ mcm_client_coldplug (McmClient *client, McmClientColdplug coldplug, GError **err
 	if (!coldplug || coldplug & MCM_CLIENT_COLDPLUG_UDEV) {
 		mcm_client_add_loading (client);
 		egg_debug ("adding devices of type UDEV");
-		if (client->priv->use_threads) {
-			thread = g_thread_create ((GThreadFunc) mcm_client_coldplug_devices_udev_thrd, client, FALSE, error);
-			if (thread == NULL)
-				goto out;
-		} else {
-			ret = mcm_client_coldplug_devices_udev (client, error);
-			if (!ret)
-				goto out;
-		}
+		ret = mcm_client_coldplug_devices_udev (client, error);
+		if (!ret)
+			goto out;
 	}
 
 	/* CUPS */
@@ -1129,15 +1071,9 @@ mcm_client_coldplug (McmClient *client, McmClientColdplug coldplug, GError **err
 	if (enable && (!coldplug || coldplug & MCM_CLIENT_COLDPLUG_CUPS)) {
 		mcm_client_add_loading (client);
 		egg_debug ("adding devices of type CUPS");
-		if (client->priv->use_threads) {
-			thread = g_thread_create ((GThreadFunc) mcm_client_coldplug_devices_cups_thrd, client, FALSE, error);
-			if (thread == NULL)
-				goto out;
-		} else {
-			ret = mcm_client_coldplug_devices_cups (client, error);
-			if (!ret)
-				goto out;
-		}
+		ret = mcm_client_coldplug_devices_cups (client, error);
+		if (!ret)
+			goto out;
 	}
 
 #ifdef HAVE_SANE
@@ -1146,15 +1082,9 @@ mcm_client_coldplug (McmClient *client, McmClientColdplug coldplug, GError **err
 	if (enable && (!coldplug || coldplug & MCM_CLIENT_COLDPLUG_SANE)) {
 		mcm_client_add_loading (client);
 		egg_debug ("adding devices of type SANE");
-		if (client->priv->use_threads) {
-			thread = g_thread_create ((GThreadFunc) mcm_client_coldplug_devices_sane_thrd, client, FALSE, error);
-			if (thread == NULL)
-				goto out;
-		} else {
-			ret = mcm_client_coldplug_devices_sane (client, error);
-			if (!ret)
-				goto out;
-		}
+		ret = mcm_client_coldplug_devices_sane (client, error);
+		if (!ret)
+			goto out;
 	}
 #endif
 out:
@@ -1298,9 +1228,6 @@ mcm_client_get_property (GObject *object, guint prop_id, GValue *value, GParamSp
 	case PROP_LOADING:
 		g_value_set_boolean (value, priv->loading);
 		break;
-	case PROP_USE_THREADS:
-		g_value_set_boolean (value, priv->use_threads);
-		break;
 	default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
 		break;
@@ -1320,9 +1247,6 @@ mcm_client_set_property (GObject *object, guint prop_id, const GValue *value, GP
 	case PROP_DISPLAY_NAME:
 		g_free (priv->display_name);
 		priv->display_name = g_strdup (g_value_get_string (value));
-		break;
-	case PROP_USE_THREADS:
-		priv->use_threads = g_value_get_boolean (value);
 		break;
 	default:
 		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -1376,14 +1300,6 @@ mcm_client_class_init (McmClientClass *klass)
 	g_object_class_install_property (object_class, PROP_LOADING, pspec);
 
 	/**
-	 * McmClient:use-threads:
-	 */
-	pspec = g_param_spec_boolean ("use-threads", NULL, NULL,
-				      TRUE,
-				      G_PARAM_READWRITE);
-	g_object_class_install_property (object_class, PROP_USE_THREADS, pspec);
-
-	/**
 	 * McmClient::added
 	 **/
 	signals[SIGNAL_ADDED] =
@@ -1427,7 +1343,6 @@ mcm_client_init (McmClient *client)
 	client->priv = MCM_CLIENT_GET_PRIVATE (client);
 	client->priv->display_name = NULL;
 	client->priv->loading_refcount = 0;
-	client->priv->use_threads = FALSE;
 	client->priv->init_cups = FALSE;
 	client->priv->init_sane = FALSE;
 	client->priv->settings = g_settings_new (MCM_SETTINGS_SCHEMA);
