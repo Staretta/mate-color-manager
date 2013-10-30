@@ -120,8 +120,8 @@ PKG_CHECK_MODULES(GUDEV, gudev-1.0)
 PKG_CHECK_MODULES(LCMS, lcms2)
 PKG_CHECK_MODULES(X11, x11)
 
-+dnl **** Check for libnotify ****
-+PKG_CHECK_MODULES(NOTIFY, libnotify >= 0.7.0)
+dnl **** Check for libnotify ****
+PKG_CHECK_MODULES(NOTIFY, libnotify >= 0.7.0)
 
 dnl **** Check for SANE ****
 AC_ARG_ENABLE(sane, AS_HELP_STRING([--enable-sane],[Enable SANE support for scanner support]), enable_sane=$enableval,
