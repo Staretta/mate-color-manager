@@ -95,9 +95,11 @@ libmcmshared_a_SOURCES =		\
 	mcm-brightness.c 			\
 	mcm-brightness.h
 
+#ifdef MCM_USE_SANE
 libmcmshared_a_SOURCES +=		\
 	mcm-device-sane.c			\
 	mcm-device-sane.h
+#endif
 
 libmcmshared_a_CFLAGS =			\
 	$(WARNINGFLAGS_C)
