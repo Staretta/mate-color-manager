@@ -110,7 +110,7 @@ mcm_trc_widget_class_init (McmTrcWidgetClass *class)
 	GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (class);
 	GObjectClass *object_class = G_OBJECT_CLASS (class);
 
-	widget_class->draw = gcm_trc_widget_draw;
+	widget_class->draw = mcm_trc_widget_draw;
 	object_class->get_property = dkp_trc_get_property;
 	object_class->set_property = dkp_trc_set_property;
 	object_class->finalize = mcm_trc_widget_finalize;

@@ -478,7 +478,7 @@ mcm_device_xrandr_is_primary (McmDeviceXrandr *device_xrandr)
 {
 	gint x, y;
 	gboolean ret = FALSE;
-	GnomeRROutput *output;
+	MateRROutput *output;
 
 	/* check we have an output */
 	output = mcm_screen_get_output_by_name (device_xrandr->priv->screen,
@@ -487,7 +487,7 @@ mcm_device_xrandr_is_primary (McmDeviceXrandr *device_xrandr)
 		goto out;
 
 	/* is the monitor our primary monitor */
-	gnome_rr_output_get_position (output, &x, &y);
+	mate_rr_output_get_position (output, &x, &y);
 	ret = (x == 0 && y == 0);
 out:
 	return ret;
