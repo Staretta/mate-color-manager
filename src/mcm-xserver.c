@@ -106,7 +106,7 @@ mcm_xserver_get_root_window_profile_data (McmXserver *xserver, guint8 **data, gs
 	atom = gdk_x11_get_xatom_by_name_for_display (priv->display_gdk, atom_name);
 	rc = XGetWindowProperty (priv->display, priv->window, atom, 0, G_MAXLONG, False, XA_CARDINAL,
 				 &type, &format, &nitems, &bytes_after, (void*) &data_tmp);
-	gdk_error_trap_pop ();
+	gdk_error_trap_pop_ignored ();
 
 	/* did the call fail */
 	if (rc != Success) {
@@ -201,7 +201,7 @@ mcm_xserver_set_root_window_profile_data (McmXserver *xserver, const guint8 *dat
 	gdk_error_trap_push ();
 	atom = gdk_x11_get_xatom_by_name_for_display (priv->display_gdk, atom_name);
 	rc = XChangeProperty (priv->display, priv->window, atom, XA_CARDINAL, 8, PropModeReplace, (unsigned char*) data, length);
-	gdk_error_trap_pop ();
+	gdk_error_trap_pop_ignored ();
 
 	/* for some reason this fails with BadRequest, but actually sets the value */
 	if (rc == BadRequest)
@@ -249,7 +249,7 @@ mcm_xserver_set_protocol_version (McmXserver *xserver, guint major, guint minor,
 	gdk_error_trap_push ();
 	atom = gdk_x11_get_xatom_by_name_for_display (priv->display_gdk, atom_name);
 	rc = XChangeProperty (priv->display, priv->window, atom, XA_CARDINAL, 8, PropModeReplace, (unsigned char*) &data, 1);
-	gdk_error_trap_pop ();
+	gdk_error_trap_pop_ignored ();
 
 	/* for some reason this fails with BadRequest, but actually sets the value */
 	if (rc == BadRequest)
@@ -295,7 +295,7 @@ mcm_xserver_remove_protocol_version (McmXserver *xserver, GError **error)
 	gdk_error_trap_push ();
 	atom = gdk_x11_get_xatom_by_name_for_display (priv->display_gdk, atom_name);
 	rc = XDeleteProperty(priv->display, priv->window, atom);
-	gdk_error_trap_pop ();
+	gdk_error_trap_pop_ignored ();
 
 	/* this fails with BadRequest if the atom was not set */
 	if (rc == BadRequest)
@@ -348,7 +348,7 @@ mcm_xserver_get_protocol_version (McmXserver *xserver, guint *major, guint *mino
 	atom = gdk_x11_get_xatom_by_name_for_display (priv->display_gdk, atom_name);
 	rc = XGetWindowProperty (priv->display, priv->window, atom, 0, G_MAXLONG, False, XA_CARDINAL,
 				 &type, &format, &nitems, &bytes_after, (unsigned char **) &data_tmp);
-	gdk_error_trap_pop ();
+	gdk_error_trap_pop_ignored ();
 
 	/* did the call fail */
 	if (rc != Success) {
@@ -402,7 +402,7 @@ mcm_xserver_remove_root_window_profile (McmXserver *xserver, GError **error)
 	gdk_error_trap_push ();
 	atom = gdk_x11_get_xatom_by_name_for_display (priv->display_gdk, atom_name);
 	rc = XDeleteProperty(priv->display, priv->window, atom);
-	gdk_error_trap_pop ();
+	gdk_error_trap_pop_ignored ();
 
 	/* this fails with BadRequest if the atom was not set */
 	if (rc == BadRequest)
@@ -466,7 +466,7 @@ mcm_xserver_get_output_profile_data (McmXserver *xserver, const gchar *output_na
 		}
 		XRRFreeOutputInfo (output);
 	}
-	gdk_error_trap_pop ();
+	gdk_error_trap_pop_ignored ();
 
 	/* we failed to match any outputs */
 	if (rc == -1) {
