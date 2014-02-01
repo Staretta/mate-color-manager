@@ -42,13 +42,14 @@ if test x$enable_strict != xno; then
 	fi
 fi
 
-# udev rules go in /lib, not /usr/lib
+dnl ---------------------------------------------------------------------------
+dnl - Where to install udev rules
+dnl ---------------------------------------------------------------------------
 if test "$prefix" = "/usr" -o "$prefix" = "/usr/local" ; then
-  slashlibdir=/lib
+	AC_SUBST([udevrulesdir], [$($PKG_CONFIG --variable=udevdir udev)/rules.d])
 else
-  slashlibdir=$prefix/lib
+	AC_SUBST([udevrulesdir], [$prefix/lib/udev/rules.d])
 fi
-AC_SUBST(slashlibdir)
 
 dnl ---------------------------------------------------------------------------
 dnl - Extra verbose warning switches

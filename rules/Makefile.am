@@ -1,4 +1,3 @@
-udevrulesdir = $(slashlibdir)/udev/rules.d
 udevrules_DATA =						\
 	95-mcm-colorimeters.rules				\
 	95-mcm-devices.rules
