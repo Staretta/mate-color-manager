@@ -481,9 +481,9 @@ mcm_mate_help (const gchar *link_id)
 	gboolean ret = TRUE;
 
 	if (link_id)
-		uri = g_strconcat ("ghelp:mate-color-manager?", link_id, NULL);
+		uri = g_strconcat ("help:mate-color-manager?", link_id, NULL);
 	else
-		uri = g_strdup ("ghelp:mate-color-manager");
+		uri = g_strdup ("help:mate-color-manager");
 	egg_debug ("opening uri %s", uri);
 
 	gtk_show_uri (NULL, uri, GDK_CURRENT_TIME, &error);

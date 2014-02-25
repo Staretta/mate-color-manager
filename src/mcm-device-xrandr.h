@@ -23,7 +23,7 @@
 #define __MCM_DEVICE_XRANDR_H
 
 #include <glib-object.h>
-#include <libmateui/mate-rr.h>
+#include <libmate-desktop/mate-rr.h>
 
 #include "mcm-device.h"
 

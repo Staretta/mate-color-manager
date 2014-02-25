@@ -32,7 +32,7 @@
 #include <glib/gi18n.h>
 #include <glib-object.h>
 #include <gudev/gudev.h>
-#include <libmateui/mate-rr.h>
+#include <libmate-desktop/mate-rr.h>
 #include <cups/cups.h>
 
 #ifdef HAVE_SANE
