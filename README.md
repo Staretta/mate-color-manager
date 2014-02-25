@@ -33,18 +33,21 @@ If start of mcm-prefs fails after installation use the --sync option
 mcm-prefs --sync
 
 
-News: 22.11.2012
+News: 2014.02.25
+Update to 1.7.0
+	-- switch to yelp tools
 
-Update to 1.5.0
-	-- Port to GSettings
+News: 2013.10.31
+Update to 1.6.1
+	-- port to lcms2
 
-News: 23.05.2013
+News: 2013.05.23
 
 Update to 1.6.0
 	-- switch to libnotify
 
-News: 31.10.2013
+News: 2012.11.02
 
-Update to 1.6.1
-	-- port to lcms2
+Update to 1.5.0
+	-- Port to GSettings
 
