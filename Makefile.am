@@ -3,8 +3,8 @@ ACLOCAL_AMFLAGS= -I m4
 SUBDIRS = 						\
 	data						\
 	help						\
-	man						\
-	po						\
+	man							\
+	po							\
 	policy						\
 	rules						\
 	src
@@ -13,17 +13,17 @@ snapshot:
 	$(MAKE) dist distdir=$(PACKAGE)-$(VERSION)-`date +"%Y%m%d"`
 
 DISTCLEANFILES =					\
-	mate-color-manager-*.tar.gz
+	mate-color-manager-*.tar.xz
 
-MAINTAINERCLEANFILES =					\
-	*~						\
+MAINTAINERCLEANFILES =			\
+	*~							\
 	compile						\
 	configure					\
 	INSTALL						\
 	install-sh					\
 	missing						\
-	mkinstalldirs					\
-	config.guess					\
+	mkinstalldirs				\
+	config.guess				\
 	ltmain.sh					\
 	config.sub					\
 	depcomp						\
@@ -31,17 +31,17 @@ MAINTAINERCLEANFILES =					\
 	config.h.*					\
 	aclocal.m4
 
-EXTRA_DIST =						\
+EXTRA_DIST =					\
 	COPYING						\
 	MAINTAINERS					\
 	AUTHORS						\
 	INSTALL						\
 	README						\
 	NEWS						\
-        autogen.sh					\
+	autogen.sh					\
 	config.h
 
-DISTCHECK_CONFIGURE_FLAGS = 				\
+DISTCHECK_CONFIGURE_FLAGS = 	\
 	--enable-gtk-doc --disable-tests
 
 distclean-local:

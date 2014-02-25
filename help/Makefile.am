@@ -1,10 +1,9 @@
-include $(top_srcdir)/mate-doc-utils.make
-dist-hook: doc-dist-hook
+@YELP_HELP_RULES@
 
-DOC_MODULE = mate-color-manager
-DOC_ENTITIES = legal.xml
-DOC_INCLUDES = 
-DOC_FIGURES =					\
+EXTRA_DIST = C/mate-help.its
+
+HELP_ID = mate-color-manager
+HELP_MEDIA =					\
 	figures/mcm-adjust.png			\
 	figures/mcm-basic.png			\
 	figures/mcm-scanner.png			\
@@ -15,5 +14,9 @@ DOC_FIGURES =					\
 	figures/mcm-device-configure.png	\
 	figures/mcm-import.png
 
-DOC_LINGUAS = cs de el es id ru
+HELP_FILES = \
+	legal.xml \
+	index.docbook
+
+HELP_LINGUAS = cs de el es id ru
 
