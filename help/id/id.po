@@ -121,8 +121,8 @@ msgid "Feedback"
 msgstr "Umpan balik"
 
 #: C/mate-color-manager.xml:93(para)
-msgid "To report a bug or make a suggestion regarding the MATE Color Manager application or this manual, follow the directions in the <ulink url=\"http://projects.gnome.org/mate-color-manager/bugs.html\" type=\"http\"><application>MATE Color Manager</application> Contact Page</ulink>."
-msgstr "Untuk melaporkan sebuah kutu atau memberikan saran tentang aplikasi Manajer Warna MATE atau panduan ini, ikuti petunjuk di <ulink url=\"http://projects.gnome.org/mate-color-manager/bugs.html\" type=\"http\">Halaman Kontak <application>Manajer Warna MATE</application></ulink>."
+msgid "To report a bug or make a suggestion regarding the MATE Color Manager application or this manual, follow the directions in the <ulink url=\"http://ithub.com/NiceandGently/mate-color-manager/issues?state=open\" type=\"http\"><application>MATE Color Manager</application> Contact Page</ulink>."
+msgstr "Untuk melaporkan sebuah kutu atau memberikan saran tentang aplikasi Manajer Warna MATE atau panduan ini, ikuti petunjuk di <ulink url=\"http://ithub.com/NiceandGently/mate-color-manager/issues?state=open\" type=\"http\">Halaman Kontak <application>Manajer Warna MATE</application></ulink>."
 
 #: C/mate-color-manager.xml:0(application)
 msgid "MATE Color Manager"
@@ -238,12 +238,12 @@ msgid "About"
 msgstr "Tentang"
 
 #: C/mate-color-manager.xml:261(para)
-msgid "MATE Color Manager was written by Richard Hughes <email>richard@hughsie.com</email>. To find more information about MATE Color Manager, please visit the <ulink url=\"http://projects.gnome.org/mate-color-manager/\" type=\"http\"><application>MATE Color Manager</application> web page</ulink>."
-msgstr "Manajer Warna MATE ditulis oleh Richard Hughes <email>richard@hughsie.com</email>. Untuk mendapatkan informasi lebih lanjut tentang Manajer Warna MATE, silakan kunjungi <ulink url=\"http://projects.gnome.org/mate-color-manager/\" type=\"http\">halaman web <application>Manajer Warna MATE</application></ulink>."
+msgid "MATE Color Manager was written by Richard Hughes <email>richard@hughsie.com</email>. To find more information about MATE Color Manager, please visit the <ulink url=\"http://github.com/NiceandGently/mate-color-manager/\" type=\"http\"><application>MATE Color Manager</application> web page</ulink>."
+msgstr "Manajer Warna MATE ditulis oleh Richard Hughes <email>richard@hughsie.com</email>. Untuk mendapatkan informasi lebih lanjut tentang Manajer Warna MATE, silakan kunjungi <ulink url=\"http://github.com/NiceandGently/mate-color-manager/\" type=\"http\">halaman web <application>Manajer Warna MATE</application></ulink>."
 
 #: C/mate-color-manager.xml:267(para)
-msgid "To report a bug or make a suggestion regarding this application or this manual, follow the directions at the <ulink url=\"http://projects.gnome.org/mate-color-manager/bugs.html\" type=\"http\"><application>MATE Color Manager</application> Bug Page</ulink>."
-msgstr "Untuk melaporkan kutu atau memberikan saran tentang aplikasi ini atau panduan ini, ikuti petunjuk pada <ulink url=\"http://projects.gnome.org/mate-color-manager/bugs.html\" type=\"http\">Halaman Kutu <application>Manajer Warna MATE</application></ulink>."
+msgid "To report a bug or make a suggestion regarding this application or this manual, follow the directions at the <ulink url=\"http://github.com/NiceandGently/mate-color-manager/issues?state=open\" type=\"http\"><application>MATE Color Manager</application> Bug Page</ulink>."
+msgstr "Untuk melaporkan kutu atau memberikan saran tentang aplikasi ini atau panduan ini, ikuti petunjuk pada <ulink url=\"http://github.com/NiceandGently/mate-color-manager/issues?state=open\" type=\"http\">Halaman Kutu <application>Manajer Warna MATE</application></ulink>."
 
 #: C/mate-color-manager.xml:273(para)
 msgid "This program is distributed under the terms of the GNU General Public license as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version. A copy of this license can be found at this <ulink url=\"mate-color-manager:gpl\" type=\"help\">link</ulink>, or in the file COPYING included with the source code of this program."

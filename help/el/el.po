@@ -140,8 +140,8 @@ msgid "Feedback"
 msgstr "Ανάδραση"
 
 #: C/mate-color-manager.xml:93(para)
-msgid "To report a bug or make a suggestion regarding the MATE Color Manager application or this manual, follow the directions in the <ulink url=\"http://projects.gnome.org/mate-color-manager/bugs.html\" type=\"http\"><application>MATE Color Manager</application> Contact Page</ulink>."
-msgstr "Για να αναφέρετε ένα σφάλμα ή να κάνετε μια πρόταση σχετικά με την εφαρμογή Διαχείριση χρώματος του MATE ή αυτό το εγχειρίδιο, ακολουθήστε τις οδηγίες στο <ulink url=\"http://projects.gnome.org/mate-color-manager/bugs.html\" type=\"http\"><application>MATE Color Manager</application> Bug Page</ulink>."
+msgid "To report a bug or make a suggestion regarding the MATE Color Manager application or this manual, follow the directions in the <ulink url=\"github.com/NiceandGently/mate-color-manager/issues?state=open\" type=\"http\"><application>MATE Color Manager</application> Contact Page</ulink>."
+msgstr "Για να αναφέρετε ένα σφάλμα ή να κάνετε μια πρόταση σχετικά με την εφαρμογή Διαχείριση χρώματος του MATE ή αυτό το εγχειρίδιο, ακολουθήστε τις οδηγίες στο <ulink url=\"http://github.com/NiceandGently/mate-color-manager/issues?state=open\" type=\"http\"><application>MATE Color Manager</application> Bug Page</ulink>."
 
 #: C/mate-color-manager.xml:0(application)
 msgid "MATE Color Manager"
@@ -531,12 +531,12 @@ msgid "About"
 msgstr "Περί"
 
 #: C/mate-color-manager.xml:627(para)
-msgid "MATE Color Manager was written by Richard Hughes <email>richard@hughsie.com</email>. To find more information about MATE Color Manager, please visit the <ulink url=\"http://projects.gnome.org/mate-color-manager/\" type=\"http\"><application>MATE Color Manager</application> web page</ulink>."
-msgstr "Η Διαχείριση χρώματος του MATE γράφτηκε από τον Richard Hughes <email>richard@hughsie.com</email>. Για περισσότερες πληροφορίες για τη Διαχείριση χρώματος του MATE, παρακαλούμε επισκεφθείτε το <ulink url=\"http://projects.gnome.org/mate-color-manager/\" type=\"http\"><application>MATE Color Manager</application> web page</ulink>."
+msgid "MATE Color Manager was written by Richard Hughes <email>richard@hughsie.com</email>. To find more information about MATE Color Manager, please visit the <ulink url=\"http://github.com/NiceandGently/mate-color-manager/\" type=\"http\"><application>MATE Color Manager</application> web page</ulink>."
+msgstr "Η Διαχείριση χρώματος του MATE γράφτηκε από τον Richard Hughes <email>richard@hughsie.com</email>. Για περισσότερες πληροφορίες για τη Διαχείριση χρώματος του MATE, παρακαλούμε επισκεφθείτε το <ulink url=\"http://github.com/NiceandGently/mate-color-manager/\" type=\"http\"><application>MATE Color Manager</application> web page</ulink>."
 
 #: C/mate-color-manager.xml:633(para)
-msgid "To report a bug or make a suggestion regarding this application or this manual, follow the directions at the <ulink url=\"http://projects.gnome.org/mate-color-manager/bugs.html\" type=\"http\"><application>MATE Color Manager</application> Bug Page</ulink>."
-msgstr "Για να αναφέρετε ένα σφάλμα ή να κάνετε μια πρόταση σχετικά με αυτή την εφαρμογή ή το εγχειρίδιο, ακολουθήστε τις οδηγίες στο <ulink url=\"http://projects.gnome.org/mate-color-manager/bugs.html\" type=\"http\"><application>MATE Color Manager</application> Bug Page</ulink>."
+msgid "To report a bug or make a suggestion regarding this application or this manual, follow the directions at the <ulink url=\"http://github.com/NiceandGently/mate-color-manager/issues?state=open\" type=\"http\"><application>MATE Color Manager</application> Bug Page</ulink>."
+msgstr "Για να αναφέρετε ένα σφάλμα ή να κάνετε μια πρόταση σχετικά με αυτή την εφαρμογή ή το εγχειρίδιο, ακολουθήστε τις οδηγίες στο <ulink url=\"http://github.com/NiceandGently/mate-color-manager/issues?state=open\" type=\"http\"><application>MATE Color Manager</application> Bug Page</ulink>."
 
 #: C/mate-color-manager.xml:639(para)
 msgid "This program is distributed under the terms of the GNU General Public license as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version. A copy of this license can be found at this <ulink url=\"mate-color-manager:gpl\" type=\"help\">link</ulink>, or in the file COPYING included with the source code of this program."
