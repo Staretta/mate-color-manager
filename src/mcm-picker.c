@@ -515,9 +515,6 @@ main (int argc, char *argv[])
 	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
 	textdomain (GETTEXT_PACKAGE);
 
-	/* setup type system */
-	g_type_init ();
-
 	/* setup LCMS */
 	cmsSetLogErrorHandler (mcm_picker_error_cb);
 
