@@ -115,10 +115,17 @@ mcm_device_changed_cb (McmDevice *device)
 static void
 mcm_device_changed (McmDevice *device)
 {
+#if !GLIB_CHECK_VERSION (2, 32, 0)
 	static GStaticMutex mutex = G_STATIC_MUTEX_INIT;
 
 	/* lock */
 	g_static_mutex_lock (&mutex);
+#else
+	static GMutex mutex = G_STATIC_MUTEX_INIT;
+
+	/* lock */
+	g_mutex_lock (&mutex);
+#endif
 
 	/* already queued, so ignoring */
 	if (device->priv->changed_id != 0)
@@ -134,8 +141,13 @@ mcm_device_changed (McmDevice *device)
 	g_source_set_name_by_id (device->priv->changed_id, "[McmDevice] device changed");
 #endif
 out:
+#if !GLIB_CHECK_VERSION (2, 32, 0)
 	/* unlock */
 	g_static_mutex_unlock (&mutex);
+#else
+	/* unlock */
+	g_mutex_unlock (&mutex);
+#endif
 }
 
 /**

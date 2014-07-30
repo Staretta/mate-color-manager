@@ -119,6 +119,7 @@ mcm_client_set_loading (McmClient *client, gboolean ret)
 static void
 mcm_client_done_loading (McmClient *client)
 {
+#if !GLIB_CHECK_VERSION (2, 32, 0)
 	static GStaticMutex mutex = G_STATIC_MUTEX_INIT;
 
 	/* decrement refcount, with a lock */
@@ -127,6 +128,16 @@ mcm_client_done_loading (McmClient *client)
 	if (client->priv->loading_refcount == 0)
 		mcm_client_set_loading (client, FALSE);
 	g_static_mutex_unlock (&mutex);
+#else
+	static GMutex mutex = G_STATIC_MUTEX_INIT;
+
+	/* decrement refcount, with a lock */
+	g_mutex_lock (&mutex);
+	client->priv->loading_refcount--;
+	if (client->priv->loading_refcount == 0)
+		mcm_client_set_loading (client, FALSE);
+	g_mutex_unlock (&mutex);
+#endif
 }
 
 /**
@@ -135,6 +146,7 @@ mcm_client_done_loading (McmClient *client)
 static void
 mcm_client_add_loading (McmClient *client)
 {
+#if !GLIB_CHECK_VERSION (2, 32, 0)
 	static GStaticMutex mutex = G_STATIC_MUTEX_INIT;
 
 	/* decrement refcount, with a lock */
@@ -143,6 +155,16 @@ mcm_client_add_loading (McmClient *client)
 	if (client->priv->loading_refcount > 0)
 		mcm_client_set_loading (client, TRUE);
 	g_static_mutex_unlock (&mutex);
+#else
+	static GMutex mutex = G_STATIC_MUTEX_INIT;
+
+	/* decrement refcount, with a lock */
+	g_mutex_lock (&mutex);
+	client->priv->loading_refcount++;
+	if (client->priv->loading_refcount > 0)
+		mcm_client_set_loading (client, TRUE);
+	g_mutex_unlock (&mutex);
+#endif
 }
 
 /**
