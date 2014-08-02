@@ -2,6 +2,10 @@ Mate:
 
 Author: Wolfgang Ulbrich <chat-to-me@raveit.de
 
+News: 2014.08.02
+Update to 1.8.0
+	-- fix some deprecations
+
 News: 2014.02.25
 Update to 1.7.0
 	-- switch to yelp tools
