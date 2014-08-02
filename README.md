@@ -37,7 +37,7 @@ Version 1.8.0
 
 Released: 2014-08-02
 
-- fix some deprecations
+-- fix some deprecations
 
 
 Version 1.7.0
