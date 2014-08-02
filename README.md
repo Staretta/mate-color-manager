@@ -34,35 +34,34 @@ mcm-prefs --sync
 
 
 Version 1.8.0
-~~~~~~~~~~~~~~
 
 Released: 2014-08-02
 
 - fix some deprecations
 
+
 Version 1.7.0
-~~~~~~~~~~~~~~
 
 Released: 2014-02-25
 
 -- switch to yelp tools
 
+
 Version 1.6.1
-~~~~~~~~~~~~~~
 
 Released: 2013-10-31
 
 -- port to lcms2
 
+
 Version 1.6.0
-~~~~~~~~~~~~~~
 
 Released: 2013-05-23
 
 -- switch to libnotify
 
+
 Version 1.5.0
-~~~~~~~~~~~~~~
 
 Released: 2012-11-02
 
