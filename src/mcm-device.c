@@ -121,7 +121,7 @@ mcm_device_changed (McmDevice *device)
 	/* lock */
 	g_static_mutex_lock (&mutex);
 #else
-	static GMutex mutex = G_STATIC_MUTEX_INIT;
+	static GMutex mutex = {0, };
 
 	/* lock */
 	g_mutex_lock (&mutex);
