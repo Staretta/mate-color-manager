@@ -27,6 +27,8 @@ libgtk2.0-dev rarian-compat libvte-dev gnome-doc-utils mate-doc-utils libunique-
 libdbus-glib-1-dev libxxf86vm-dev libxrandr-dev libmatedesktop-dev liblcms-dev
 libcups2-dev libsane-dev libtiff-dev libcanberra-gtk-dev mate-common
 libnotify-dev libexiv2-dev libglib2.0-dev
+libstartup-notification0-dev
+libdconf-dev
 
 If start of mcm-prefs fails after installation use the --sync option
 
