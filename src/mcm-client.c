@@ -129,7 +129,7 @@ mcm_client_done_loading (McmClient *client)
 		mcm_client_set_loading (client, FALSE);
 	g_static_mutex_unlock (&mutex);
 #else
-	static GMutex mutex = G_STATIC_MUTEX_INIT;
+	static GMutex mutex = {0, };
 
 	/* decrement refcount, with a lock */
 	g_mutex_lock (&mutex);
@@ -156,7 +156,7 @@ mcm_client_add_loading (McmClient *client)
 		mcm_client_set_loading (client, TRUE);
 	g_static_mutex_unlock (&mutex);
 #else
-	static GMutex mutex = G_STATIC_MUTEX_INIT;
+	static GMutex mutex = {0, };
 
 	/* decrement refcount, with a lock */
 	g_mutex_lock (&mutex);
