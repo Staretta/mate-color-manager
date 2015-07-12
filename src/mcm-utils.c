@@ -245,7 +245,7 @@ mcm_utils_is_package_installed (const gchar *package_name)
 						PK_DBUS_INTERFACE_QUERY,
 						"IsInstalled",
 						args,
-						G_VARIANT_TYPE ("(b)"),
+						NULL,
 						G_DBUS_CALL_FLAGS_NONE,
 						G_MAXINT, NULL, &error);
 	if (response == NULL) {
