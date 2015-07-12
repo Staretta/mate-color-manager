@@ -1,5 +1,6 @@
 data/mcm-apply.desktop.in
 data/mcm-import.desktop.in
+data/mcm-picker.desktop.in
 data/mcm-prefs.desktop.in
 data/org.mate.color-manager.gschema.xml
 policy/org.mate.color.policy.in
