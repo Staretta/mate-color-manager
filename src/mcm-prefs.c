@@ -2679,7 +2679,6 @@ mcm_prefs_startup_phase2_idle_cb (gpointer user_data)
 	GtkWidget *widget;
 	GtkTreeSelection *selection;
 	GtkTreePath *path;
-	gboolean ret;
 
 	/* update list of profiles */
 	mcm_prefs_update_profile_list ();
@@ -2690,11 +2689,6 @@ mcm_prefs_startup_phase2_idle_cb (gpointer user_data)
 	path = gtk_tree_path_new_from_string ("0");
 	gtk_tree_selection_select_path (selection, path);
 	gtk_tree_path_free (path);
-
-	/* do we show the shared-color-profiles-extra installer? */
-	egg_debug ("getting installed");
-	ret = mcm_utils_is_package_installed (MCM_PREFS_PACKAGE_NAME_COLOR_PROFILES_EXTRA);
-	gtk_widget_set_visible (info_bar_profiles, !ret);
 
 	return FALSE;
 }
